@@ -28,4 +28,6 @@ Route::prefix('rally-2')->group(function () {
     Route::get('/scanner', [GameController::class, 'scanner'])->name('rally-2.scanner');
     Route::get('/events', [GameController::class, 'events'])->name('rally-2.events');
     Route::get('/inventory', [GameController::class, 'inventory'])->name('rally-2.inventory');
+    // {id} ini id dari qr code nya yawww
+    Route::get('/question/{id}', [GameController::class, 'question'])->name('rally-2.question');
 });

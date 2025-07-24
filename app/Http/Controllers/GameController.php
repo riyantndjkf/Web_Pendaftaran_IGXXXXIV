@@ -62,4 +62,9 @@ class GameController extends Controller
     {
         return view('rally-2.inventory');
     }
+
+    public function question()
+    {
+        return view('rally-2.question');
+    }
 }
