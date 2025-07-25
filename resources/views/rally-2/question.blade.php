@@ -9,8 +9,10 @@
                 <span class="text-4xl font-bold text-green-600">${{ $soal->reward_amount }}</span>
             </div>
 
-            <div class="flex items-start justify-start">
-                <p class="text-xl font-bold text-black">{{ $soal->pertanyaan }}</p>
+            <div class="flex flex-wrap items-start justify-start">
+                <p class="text-xl font-bold text-black break-words">
+                    {{ $soal->pertanyaan }}
+                </p>
             </div>
 
             <div class="flex flex-col gap-4 mt-4">
@@ -45,7 +47,7 @@
                         type="text" 
                         name="jawaban" 
                         id="jawabanInput"
-                        class="w-full p-3 border-2 rounded-lg text-lg"
+                        class="w-full p-3 border-2 rounded-lg text-lg text-black"
                         placeholder="Contoh: -3.5 atau +5"
                         pattern="^[-+]?[0-9]*\.?[0-9]+$"
                         inputmode="decimal"
@@ -209,6 +211,8 @@
                 selectedOption = null;
                 document.getElementById('submitBtn').disabled = true;
             }
+
+            window.location.href = '/rally-2/scanner';
         }
 
         window.onclick = function (event) {
