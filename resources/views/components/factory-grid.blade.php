@@ -1,10 +1,8 @@
 @props(['factories'])
 
-<!-- Connection Container -->
 <div class="relative">
     <!-- SVG Container for Arrows -->
     <svg id="connectionArrows" class="absolute inset-0 pointer-events-none z-10" style="width: 100%; height: 100%;">
-        <!-- Connection arrows will be drawn here -->
     </svg>
 
     <div class="grid grid-cols-4 gap-2" id="factoryGrid">
@@ -168,7 +166,6 @@
             <p class="text-gray-600 mb-4">Choose factory to connect:</p>
 
             <div id="factoryList" class="space-y-2 mb-6 max-h-48 overflow-y-auto">
-                <!-- Factory list will be populated here -->
             </div>
 
             <button onclick="hideConnectModal()"
@@ -181,7 +178,6 @@
 
 <!-- SVG Container for Arrows -->
 <svg id="connectionArrows" class="absolute inset-0 pointer-events-none z-10" style="width: 100%; height: 100%;">
-    <!-- Connection arrows will be drawn here -->
 </svg>
 <div id="sellModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
     <div class="bg-white rounded-lg p-6 max-w-sm mx-4 transform scale-90 opacity-0 transition-all duration-200">
@@ -207,9 +203,8 @@
 <script>
     let selectedFactoryIndex = null;
     let selectedFactory = null;
-    let connections = []; // Store connections between factories
+    let connections = [];
 
-    // Sample factories data for demonstration
     let factoriesData = @json($factories);
     let selectedWorkerFactoryIndex = null;
     let selectedWorkerFactory = null;
@@ -229,11 +224,9 @@
 
         if (factory.unlocked) {
             if (factory.owned) {
-                // Show upgrade and sell buttons for owned machines
                 buyButton.classList.add('hidden');
                 ownedButtons.classList.remove('hidden');
             } else {
-                // Show buy button for unlocked but not owned machines
                 buyButton.classList.remove('hidden');
                 ownedButtons.classList.add('hidden');
                 buyButton.textContent = 'BUY';
@@ -241,7 +234,6 @@
                 buyButton.disabled = false;
             }
         } else {
-            // Show locked state
             buyButton.classList.remove('hidden');
             ownedButtons.classList.add('hidden');
             buyButton.textContent = 'LOCKED';
@@ -281,7 +273,7 @@
     function showUpgradeModal() {
         const currentLevel = selectedFactory.level || 1;
         const nextLevel = currentLevel + 1;
-        const upgradePrice = (selectedFactory.price || 3000) + 1000; // Example upgrade price
+        const upgradePrice = (selectedFactory.price || 3000) + 1000;
         const newCapacity = (selectedFactory.capacity || 5) + 1;
         const newTime = Math.max((selectedFactory.production_time || 6) - 2, 1);
 
@@ -304,7 +296,7 @@
     }
 
     function showSellModal() {
-        const sellPrice = Math.floor((selectedFactory.price || 3000) * 0.7); // 70% of original price
+        const sellPrice = Math.floor((selectedFactory.price || 3000) * 0.7);
         document.getElementById('sellPrice').textContent = `+$${sellPrice}`;
 
         hideFactoryInfo();
@@ -357,7 +349,6 @@
     }
 
     function connectFactories(fromIndex, toIndex) {
-        // Check if connection already exists
         const existingConnection = connections.find(conn =>
             (conn.from === fromIndex && conn.to === toIndex) ||
             (conn.from === toIndex && conn.to === fromIndex)
@@ -379,7 +370,6 @@
         const grid = document.getElementById('factoryGrid');
         const gridRect = grid.getBoundingClientRect();
 
-        // Clear existing arrows
         svg.innerHTML = '';
 
         connections.forEach(connection => {
@@ -390,16 +380,13 @@
                 const fromRect = fromElement.getBoundingClientRect();
                 const toRect = toElement.getBoundingClientRect();
 
-                // Calculate positions relative to the grid container
                 const fromX = fromRect.left + fromRect.width / 2 - gridRect.left;
                 const fromY = fromRect.top + fromRect.height / 2 - gridRect.top;
                 const toX = toRect.left + toRect.width / 2 - gridRect.left;
                 const toY = toRect.top + toRect.height / 2 - gridRect.top;
 
-                // Create arrow path
                 const arrow = document.createElementNS('http://www.w3.org/2000/svg', 'g');
 
-                // Arrow line
                 const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
                 line.setAttribute('x1', fromX);
                 line.setAttribute('y1', fromY);
@@ -414,7 +401,6 @@
             }
         });
 
-        // Create arrowhead marker if it doesn't exist
         if (!svg.querySelector('#arrowhead')) {
             const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
             const marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
@@ -435,14 +421,12 @@
         }
     }
 
-    // Redraw connections when window is resized
     window.addEventListener('resize', drawConnections);
 
     function showWorkerModal(index, factory) {
         selectedWorkerFactoryIndex = index;
         selectedWorkerFactory = factory;
 
-        // Only show worker modal if factory is unlocked
         if (!factory.unlocked) {
             alert('Factory must be unlocked first!');
             return;
@@ -453,24 +437,19 @@
         const hireButton = document.getElementById('hireButton');
         const layoffButton = document.getElementById('layoffButton');
 
-        // Set title
         workerTitle.textContent = 'Hire worker';
 
-        // Set hire price (example: $1000)
         workerPrice.textContent = '$ 1000';
         workerPrice.className = 'text-green-600 font-bold text-2xl mb-6';
 
-        // Check if factory has workers (simulate with a property)
-        const hasWorkers = factory.workers > 0; // Assuming workers property exists
+        const hasWorkers = factory.workers > 0;
 
         if (hasWorkers) {
-            // Show both hire and layoff buttons
             hireButton.classList.remove('hidden');
             layoffButton.classList.remove('hidden');
             hireButton.className = 'flex-1 bg-green-500 text-white py-3 rounded-lg font-bold hover:bg-green-600 transition';
             layoffButton.className = 'flex-1 bg-red-500 text-white py-3 rounded-lg font-bold hover:bg-red-600 transition';
         } else {
-            // Show only hire button, hide layoff
             hireButton.classList.remove('hidden');
             layoffButton.classList.add('hidden');
             hireButton.className = 'w-full bg-green-500 text-white py-3 rounded-lg font-bold hover:bg-green-600 transition';
@@ -492,7 +471,6 @@
     }
 
     function showLayoffConfirm() {
-        // Set layoff cost
         document.getElementById('layoffCost').textContent = '-$500';
 
         hideWorkerModal();
@@ -508,7 +486,6 @@
         hideLayoffConfirm();
     }
 
-    // Helper functions for modal animations
     function showModal(modalId) {
         const modal = document.getElementById(modalId);
         const modalContent = modal.querySelector('.bg-white');
@@ -533,7 +510,6 @@
         }, 200);
     }
 
-    // Event listeners for closing modals
     document.getElementById('factoryInfoModal').addEventListener('click', function (e) {
         if (e.target === this) {
             hideFactoryInfo();
@@ -576,7 +552,6 @@
         }
     });
 
-    // Keyboard event listener for ESC key
     document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
             if (!document.getElementById('layoffConfirmModal').classList.contains('hidden')) {
