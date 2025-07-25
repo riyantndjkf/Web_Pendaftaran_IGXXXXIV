@@ -5,7 +5,7 @@
 @section('content')
     <div class="flex justify-between items-center p-4 bg-yellow-600">
         <div class="text-2xl font-bold text-black">{{ $gameData['timer'] }}</div>
-        <button onclick="toggleSideMenu()" >
+        <button onclick="toggleSideMenu()">
             <x-radix-text-align-justify class="w-10 h-10 text-black" />
         </button>
     </div>
@@ -45,9 +45,12 @@
 
         <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 z-50">
             <img src="{{ asset('icons/icon_lock.svg') }}" alt="icon lock">
+            {{-- Buat aja kondisi untuk tampilin button maintenancenya --}}
             <button onclick="showUnlockModal()"
                 class="bg-green-500 text-white px-6 text-3xl py-2 rounded-md font-bold hover:bg-green-600 transition">
                 UNLOCK
+                {{-- ganti jadi ini kalo maintenance --}}
+                {{-- MAINTENANCE --}}
             </button>
         </div>
     </div>
@@ -60,6 +63,8 @@
                 <h3 class="text-2xl font-bold text-black mb-4">UNLOCK FACTORY?</h3>
                 <div class="flex justify-center">
                     <img src="{{ asset('icons/icon_key.svg') }}" alt="Icon Kunci" />
+                    {{-- Ini icon kalo dibagian maintenance --}}
+                    {{-- <img src="{{ asset('icons/icon_maintenance.svg') }}" alt="Icon Maintenance" /> --}}
                 </div>
                 <div class="text-green-600 font-bold text-xl mb-4">${{ number_format($gameData['unlock_cost']) }}</div>
                 <div class="flex space-x-3">
