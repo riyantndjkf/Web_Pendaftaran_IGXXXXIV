@@ -30,8 +30,18 @@
                                     qrbox: { width: 400, height: 350 },
                                 },
                                 qrCodeMessage => {
-                                    document.getElementById("qr-reader-results").innerText = "QR Code: " + qrCodeMessage;
-                                    qrReader.stop();
+                                    qrReader.stop().then(() => {
+                                        console.log("QR Code Detected:", qrCodeMessage);
+
+                                        if (/^\d+$/.test(qrCodeMessage)) {
+                                            const id_soal = qrCodeMessage;
+                                            window.location.href = `${id_soal}`;
+                                        } else {
+                                            document.getElementById("qr-reader-results").innerText = "QR tidak valid!";
+                                        }
+                                    }).catch(err => {
+                                        console.error("Gagal stop kamera:", err);
+                                    });
                                 },
                                 errorMessage => {
                                 }
