@@ -22,15 +22,17 @@
 </head>
  <body class="bg-[#14191A] text-white">
 
-    <header class="bg-[#0D1B2E] p-4 fixed top-0 left-0 right-0 z-50">
+    <header class="bg-[#0D1B2E] py-2 px-4 fixed top-0 left-0 right-0 z-50">
         <nav class="flex justify-between items-center">
-            <div class="text-xl font-bold"></div>
-            <ul class="flex space-x-10">
-                <li><a href="#" class="hover:text-gray-300 font-bold">HOME</a></li>
-                <li><a href="#" class="hover:text-gray-300 font-bold">ABOUT US</a></li>
-                <li><a href="#" class="hover:text-gray-300 font-bold">FAQ</a></li>
-                <li><a href="#" class="hover:text-gray-300 font-bold">GUIDEBOOK</a></li>
-                <li><a href="#" class="hover:text-gray-300 font-bold border border-gray-500 px-3 py-1 rounded-md bg-gray-500">ACCOUNT</a></li>
+            <!-- PERUBAHAN DI SINI: Mengganti teks dengan gambar logo -->
+            <div class="flex items-center">
+                <img src="{{ asset('images/Logo_Industrial_Games.png') }}" alt="Industrial Games Logo" class="h-12 w-auto">
+            </div>
+            <ul class="flex space-x-10 ml-auto">
+                <li><a href="{{ url('/') }}" class="hover:text-gray-300 font-bold">HOME</a></li>
+                <li><a href="{{ url('/aboutus') }}" class="hover:text-gray-300 font-bold">ABOUT US</a></li>
+                <li><a href="{{ url('/faq') }}" class="hover:text-gray-300 font-bold">FAQ</a></li>
+                <li><a href="{{ url('/account') }}" class="hover:text-gray-300 font-bold border border-gray-500 px-3 py-1 rounded-md bg-gray-500">ACCOUNT</a></li>
             </ul>
         </nav>
     </header>
@@ -70,7 +72,7 @@
         <img src="{{ asset('images/Prizes.png') }}" alt="Prizes Content" class="w-full h-auto mt-[-6rem]"> 
     </section>
 
-<footer class="bg-[#120803] py-32">
+<footer class="bg-[#120803] pt-32">
         <!-- PERUBAHAN DI SINI: Mengubah grid-cols-1 md:grid-cols-3 menjadi grid-cols-1 md:grid-cols-2 dan menambahkan grid-rows-2 -->
         <div class="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 px-4">
             <!-- Social Media -->
@@ -99,12 +101,30 @@
                 <h3 class="text-3xl font-bold mb-[200px]">SPONSORED BY:</h3>
                 <div class="flex flex-wrap gap-4">
                     <!-- Placeholder for sponsor logos if any -->
-                    <!-- Contoh: -->
-                    <!-- <img src="{{ asset('images/sponsor1.png') }}" alt="Sponsor 1" class="h-12"> -->
-                    <!-- <img src="{{ asset('images/sponsor2.png') }}" alt="Sponsor 2" class="h-12"> -->
                 </div>
             </div>
         </div>
     </footer>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.getElementById('carouselSlides');
+        const totalSlides = slides ? slides.children.length : 0;
+
+        function moveSlide(direction) {
+            currentSlide += direction;
+            if (currentSlide < 0) {
+                currentSlide = totalSlides - 1;
+            } else if (currentSlide >= totalSlides) {
+                currentSlide = 0;
+            }
+            slides.style.transform = `translateX(${-currentSlide * 100}%)`;
+        }
+
+        // Optional: Auto-play carousel
+        // setInterval(() => {
+        //     moveSlide(1);
+        // }, 5000); // Change image every 5 seconds
+    </script>
 </body>
 </html>

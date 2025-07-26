@@ -31,16 +31,16 @@
 <body class="bg-[#14191A] text-white">
 
     <!-- Header -->
-    <header class="bg-[#0D1B2E] p-4">
+     <header class="bg-[#0D1B2E] py-2 px-4 fixed top-0 left-0 right-0 z-50">
         <nav class="flex justify-between items-center">
+            <!-- PERUBAHAN DI SINI: Mengganti teks dengan gambar logo -->
             <div class="flex items-center">
-                <img src="{{ asset('images/logo_ig.png') }}" alt="Industrial Games Logo">
+                <img src="{{ asset('images/Logo_Industrial_Games.png') }}" alt="Industrial Games Logo" class="h-12 w-auto">
             </div>
-            <ul class="flex space-x-10">
-                <li><a href="#" class="hover:text-gray-300 font-bold">HOME</a></li>
-                <li><a href="#" class="hover:text-gray-300 font-bold">ABOUT US</a></li>
-                <li><a href="#" class="hover:text-gray-300 font-bold">FAQ</a></li>
-                <li><a href="#" class="hover:text-gray-300 font-bold">GUIDEBOOK</a></li>
+            <ul class="flex space-x-10 ml-auto">
+                <li><a href="{{ url('/') }}" class="hover:text-gray-300 font-bold">HOME</a></li>
+                <li><a href="{{ url('/aboutus') }}" class="hover:text-gray-300 font-bold">ABOUT US</a></li>
+                <li><a href="{{ url('/faq') }}" class="hover:text-gray-300 font-bold">FAQ</a></li>
                 <li><a href="#" class="hover:text-gray-300 font-bold border border-gray-500 px-3 py-1 rounded-md bg-gray-500">ACCOUNT</a></li>
             </ul>
         </nav>
@@ -49,7 +49,7 @@
     <!-- Main Content - Initial Registration Form -->
     <main class="flex-grow flex items-center justify-center py-12 px-4 relative min-h-screen" style="background-image: url('{{ asset('images/Background_Registration.png') }}'); background-size: cover; background-position: center;">
         <!-- Overlay untuk background agar konten lebih menonjol -->
-        <div class="absolute inset-0 bg-black bg-opacity-10"></div>
+        <div class="absolute inset-0 bg-black bg-opacity-0"></div>
 
         <!-- PERUBAHAN DI SINI: Mengubah max-w-md menjadi max-w-4xl -->
         <div class="relative z-10 w-full max-w-4xl flex flex-col items-center">
