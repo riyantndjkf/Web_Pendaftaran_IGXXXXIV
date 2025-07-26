@@ -52,7 +52,7 @@
                         pattern="^[-+]?[0-9]*\.?[0-9]+$"
                         inputmode="decimal"
                         required
-                        oninput="enableSubmitIfValid()"
+                        oninput="formatRibuan(this); enableSubmitIfValid();"
                     >
                 @endif
             </div>
@@ -127,13 +127,51 @@
             document.getElementById('submitBtn').disabled = false;
         }
 
-        function enableSubmitIfValid() {
-            const input = document.getElementById('jawabanInput');
-            const submitBtn = document.getElementById('submitBtn');
-            const pattern = /^[-+]?[0-9]*\.?[0-9]+$/;
+        function formatRibuan(input) {
+            let raw = input.value;
 
-            if (input && submitBtn) {
-                const isValid = pattern.test(input.value.trim());
+            // Simpan tanda "+" atau "-"
+            let prefix = '';
+            if (raw.startsWith('+') || raw.startsWith('-')) {
+                prefix = raw.charAt(0);
+                raw = raw.slice(1);
+            }
+
+            // Hapus titik
+            let angka = raw.replace(/\./g, '');
+
+            // Boleh kosong saat sedang diketik
+            if (angka === '') {
+                input.value = prefix;
+                document.getElementById('selectedAnswer').value = '';
+                return;
+            }
+
+            // Cegah input jika bukan angka
+            if (!/^\d+$/.test(angka)) {
+                input.value = '';
+                document.getElementById('selectedAnswer').value = '';
+                return;
+            }
+
+            // Tambahkan titik ribuan
+            let formatted = angka.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            input.value = prefix + formatted;
+
+            // Simpan versi tanpa titik ke hidden input
+            document.getElementById('selectedAnswer').value = prefix + angka;
+        }
+
+        function enableSubmitIfValid() {
+            const inputHidden = document.getElementById('selectedAnswer');
+            const submitBtn = document.getElementById('submitBtn');
+
+            // Pola: angka bulat/desimal, bisa dengan tanda + atau -
+            const pattern = /^[-+]?[0-9]+(\.[0-9]+)?$/;
+
+            if (inputHidden && submitBtn) {
+                const value = inputHidden.value.trim();
+                const isValid = pattern.test(value);
                 submitBtn.disabled = !isValid;
             }
         }

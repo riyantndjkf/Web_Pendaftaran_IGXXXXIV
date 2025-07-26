@@ -36,6 +36,10 @@ class SoalQRController extends Controller
         $jawabanUser = $normalize($request->input('jawaban'));
         $jawabanBenar = $normalize($soal->jawaban_benar);
 
+        // Logging untuk debug
+        Log::info("JAWABAN USER: " . $jawabanUser);
+        Log::info("JAWABAN BENAR: " . $jawabanBenar);
+        
         // Perbandingan
         $status = $jawabanUser === $jawabanBenar ? 'benar' : 'salah';
 
