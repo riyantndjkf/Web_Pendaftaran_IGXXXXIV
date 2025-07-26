@@ -13,6 +13,11 @@
                 <p class="text-xl font-bold text-black break-words">
                     {{ $soal->pertanyaan }}
                 </p>
+                @if ($soal->gambar_soal)
+                    <div class="my-4">
+                        <img src="{{ asset('storage/' . $soal->gambar_soal) }}" alt="Gambar Soal" class="max-w-full h-auto mx-auto rounded-lg border">
+                    </div>
+                @endif
             </div>
 
             <div class="flex flex-col gap-4 mt-4">

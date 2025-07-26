@@ -18,5 +18,6 @@ class SoalQR extends Model
         'option_3',
         'option_4',
         'jawaban_benar',
+        'gambar_soal',
     ];
 }
