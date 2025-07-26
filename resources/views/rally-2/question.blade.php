@@ -49,10 +49,9 @@
                         id="jawabanInput"
                         class="w-full p-3 border-2 rounded-lg text-lg text-black"
                         placeholder="Contoh: -3.5 atau +5"
-                        pattern="^[-+]?[0-9]*\.?[0-9]+$"
                         inputmode="decimal"
                         required
-                        oninput="formatRibuan(this); enableSubmitIfValid();"
+                        oninput="enableSubmitIfValid();"
                     >
                 @endif
             </div>
@@ -127,6 +126,16 @@
             document.getElementById('submitBtn').disabled = false;
         }
 
+        document.addEventListener('DOMContentLoaded', function () {
+            const input = document.getElementById('jawabanInput');
+
+            input.addEventListener('input', function () {
+                // Ganti koma dengan titik secara otomatis
+                input.value = input.value.replace(',', '.');
+            });
+        });
+
+        /* Fungsi dibawah sebenernya mau dipake tapi tabrakan sama input desimal :(
         function formatRibuan(input) {
             let raw = input.value;
 
@@ -160,21 +169,21 @@
 
             // Simpan versi tanpa titik ke hidden input
             document.getElementById('selectedAnswer').value = prefix + angka;
-        }
+        }*/
 
         function enableSubmitIfValid() {
-            const inputHidden = document.getElementById('selectedAnswer');
-            const submitBtn = document.getElementById('submitBtn');
+            const input = document.getElementById('jawabanInput');
+            const nilai = input.value.trim();
+            const isValid = /^[-+]?[0-9]*\.?[0-9]+$/.test(nilai);  // validasi desimal
+            document.getElementById('submitBtn').disabled = !isValid;
 
-            // Pola: angka bulat/desimal, bisa dengan tanda + atau -
-            const pattern = /^[-+]?[0-9]+(\.[0-9]+)?$/;
-
-            if (inputHidden && submitBtn) {
-                const value = inputHidden.value.trim();
-                const isValid = pattern.test(value);
-                submitBtn.disabled = !isValid;
+            if (isValid) {
+                document.getElementById('selectedAnswer').value = nilai;
+            } else {
+                document.getElementById('selectedAnswer').value = '';
             }
         }
+
 
         async function submitAnswer() {
             const submitBtn = document.getElementById('submitBtn');
