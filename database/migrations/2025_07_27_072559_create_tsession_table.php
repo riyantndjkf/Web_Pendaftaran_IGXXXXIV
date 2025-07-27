@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tsoalqr', function (Blueprint $table) {
-            $table->string('gambar_soal')->nullable();
+        Schema::create('tsession', function (Blueprint $table) {
+            $table->id();
+            $table->integer('durasi');
+            $table->integer('demand');
+            $table->string('event')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -21,7 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //Schema::table('tsoalqr', function (Blueprint $table) {});
-        Schema::dropIfExists('tsoalqr');
+        Schema::dropIfExists('tsession');
     }
 };
