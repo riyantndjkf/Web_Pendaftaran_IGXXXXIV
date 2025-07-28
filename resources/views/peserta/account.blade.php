@@ -65,7 +65,7 @@
             </div>
 
             <div class="mt-10">
-                <a href="{{ url('/dashboard') }}" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-8 rounded-full text-lg transition duration-300 shadow-lg hover:shadow-xl">
+                <a href="{{ route('peserta.home') }}" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-8 rounded-full text-lg transition duration-300 shadow-lg hover:shadow-xl">
                     Kembali ke Dashboard
                 </a>
             </div>

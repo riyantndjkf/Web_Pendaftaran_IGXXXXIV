@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\RallyGames;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BundleRegistrationController;
 
@@ -20,11 +21,11 @@ Route::get('/', function () {
 
 
 Route::get('/faq', function () {
-    return view('faq');
+    return view('peserta.faq');
 })->name('faq');
 
 Route::get('/aboutus', function () {
-    return view('aboutus');
+    return view('peserta.aboutus');
 })->name('aboutus');
 
 
@@ -63,4 +64,5 @@ Route::group([
 ], function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/accountdetail', [HomeController::class, 'account'])->name('account-detail');
+    Route::get('/rally', [RallyGames::class, 'index'])->name('rally');
 });

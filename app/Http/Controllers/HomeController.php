@@ -24,14 +24,14 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        return view('peserta.home');
     }
 
     public function account()
     {
         $user = Auth::user();        
         $team = Team::with('members')->find($user->id);
-        return view('account', [
+        return view('peserta.account', [
             'team' => $team
         ]);
     }

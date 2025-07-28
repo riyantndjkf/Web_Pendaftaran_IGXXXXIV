@@ -18,7 +18,9 @@
             <a href="{{ url('/faq') }}" class="hover:text-gray-300">FAQ</a>
 
             @auth
+                <a href="{{ route("peserta.rally") }}" class="hover:text-gray-300">RALLY</a>
                 <a href="{{ route('peserta.account-detail') }}" class="bg-gray-500 px-3 py-1 rounded-md hover:bg-gray-600 border border-gray-400 text-white">ACCOUNT</a>
+                
             @else
                 <a href="{{ route('login') }}" class="hover:text-gray-300">LOGIN</a>
                 <a href="{{ route('register') }}" class="ml-2 px-3 py-1 border border-white rounded hover:bg-white hover:text-[#0D1B2E] transition">REGISTER</a>
