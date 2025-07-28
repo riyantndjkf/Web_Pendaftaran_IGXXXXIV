@@ -1,1 +1,3 @@
-*.sqlite*
+*
+!data_sql/
+!data_sql/*.sql
