@@ -3,70 +3,90 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Team;
 use Illuminate\Foundation\Auth\RegistersUsers;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class RegisterController extends Controller
 {
-    /*
-    |--------------------------------------------------------------------------
-    | Register Controller
-    |--------------------------------------------------------------------------
-    |
-    | This controller handles the registration of new users as well as their
-    | validation and creation. By default this controller uses a trait to
-    | provide this functionality without requiring any additional code.
-    |
-    */
-
     use RegistersUsers;
 
-    /**
-     * Where to redirect users after registration.
-     *
-     * @var string
-     */
     protected $redirectTo = '/home';
 
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         $this->middleware('guest');
     }
 
-    /**
-     * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    protected function validator(array $data)
+    public function showRegistrationForm()
     {
-        return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
-        ]);
+        return view('auth.register'); 
     }
 
-    /**
-     * Create a new user instance after a valid registration.
-     *
-     * @param  array  $data
-     * @return \App\Models\User
-     */
-    protected function create(array $data)
+    public function register(Request $request)
     {
-        return User::create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
+        // 1. VALIDASI DATA: TAMBAHKAN 'asal_sekolah'
+        $validator = Validator::make($request->all(), [
+            'nama_tim' => ['required', 'string', 'max:255', 'unique:teams,nama_tim'],
+            'password' => ['required', 'string', 'min:8'],
+            'asal_sekolah' => ['required', 'string', 'max:255'], // <-- TAMBAHAN
+            'members' => ['required', 'array', 'size:3'],
+            'members.*.nama_lengkap' => ['required', 'string', 'max:255'],
+            'members.*.email' => ['required', 'email', 'distinct', 'unique:members,email'],
+            'members.*.kartu_pelajar' => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
         ]);
+
+        if ($validator->fails()) {
+            return redirect('register')->withErrors($validator)->withInput();
+        }
+
+        DB::beginTransaction();
+        try {
+            // 2. BUAT TEAM: TAMBAHKAN 'asal_sekolah'
+            $team = Team::create([
+                'nama_tim' => $request->nama_tim,
+                'password' => $request->password,
+                'asal_sekolah' => $request->asal_sekolah, // <-- TAMBAHAN
+            ]);
+
+            // Logika untuk anggota tetap sama
+            foreach ($request->members as $index => $memberData) {
+                $file = $memberData['kartu_pelajar'];
+                $namaTimSlug = Str::slug($request->nama_tim);
+                $fileName = "{$namaTimSlug}_" . ($index + 1) . ".{$file->getClientOriginalExtension()}";
+                $path = $file->storeAs('public/kartu_pelajar', $fileName);
+
+                $team->members()->create([
+                    'status' => ($index == 0) ? 'ketua' : 'anggota',
+                    'nama_lengkap' => $memberData['nama_lengkap'],
+                    'alamat' => $memberData['alamat'],
+                    'nomor_telepon' => $memberData['nomor_telepon'],
+                    'email' => $memberData['email'],
+                    'riwayat_penyakit' => $memberData['riwayat_penyakit'] ?? '-',
+                    'alergi' => $memberData['alergi'] ?? '-',
+                    'path_kartu_pelajar' => $path,
+                ]);
+            }
+
+            DB::commit();
+            event(new Registered($team));
+            $this->guard()->login($team);
+            return $this->registered($request, $team) ?: redirect($this->redirectPath());
+
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            Log::error('Registrasi Gagal: ' . $th->getMessage());
+            return redirect('register')->with('error', 'Terjadi kesalahan saat registrasi, silakan coba lagi.')->withInput();
+        }
     }
+    
+    // Method validator() dan create() di bawah ini tidak terpakai oleh alur kita.
+    protected function validator(array $data){/*...*/}
+    protected function create(array $data){/*...*/}
 }
