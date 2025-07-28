@@ -62,13 +62,15 @@
                 <!-- PERUBAHAN DI SINI: Menghapus mb-64 -->
                 <div class="flex flex-row space-x-4 justify-center w-full mt-4 mb-32">
                     <!-- PERUBAHAN DI SINI: Menambahkan href -->
-                    <a class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 px-32 rounded-full text-xl transition duration-300 shadow-lg hover:shadow-xl text-center">
-                        Single Package
-                    </a>
-                    <!-- PERUBAHAN DI SINI: Menambahkan href -->
-                    <a class="bg-[#956238] hover:bg-[#A57248] text-white font-bold py-4 px-32 rounded-full text-xl transition duration-300 shadow-lg hover:shadow-xl text-center">
-                        Bundling Package
-                    </a>
+                  <!-- TOMBOL SINGLE PACKAGE (FINAL) -->
+                <a href="{{ route('register.single.form') }}" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-4 px-8 md:px-32 rounded-full text-xl transition duration-300 shadow-lg hover:shadow-xl text-center">
+                    Single Package
+                </a>
+                
+                <!-- TOMBOL BUNDLING PACKAGE (FINAL) -->
+                <a href="{{ route('register.bundle.form') }}" class="bg-[#956238] hover:bg-[#A57248] text-white font-bold py-4 px-8 md:px-32 rounded-full text-xl transition duration-300 shadow-lg hover:shadow-xl text-center">
+                    Bundling Package
+                </a>
                 </div>
             </form>
         </div>
