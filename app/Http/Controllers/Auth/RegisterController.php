@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use App\Models\User;
 
 class RegisterController extends Controller
 {
@@ -54,6 +55,11 @@ class RegisterController extends Controller
                 'password' => $request->password,
                 'asal_sekolah' => $request->asal_sekolah, // <-- TAMBAHAN
             ]);
+            User::create([
+                'name' => $request->nama_tim,
+                'role' => 'peserta',
+                'password' => bcrypt($request->password),
+            ]);
 
             // Logika untuk anggota tetap sama
             foreach ($request->members as $index => $memberData) {
@@ -76,8 +82,7 @@ class RegisterController extends Controller
 
             DB::commit();
             event(new Registered($team));
-            $this->guard()->login($team);
-            return $this->registered($request, $team) ?: redirect($this->redirectPath());
+           return redirect()->route('register.success');
 
         } catch (\Throwable $th) {
             DB::rollBack();

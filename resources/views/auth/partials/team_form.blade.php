@@ -1,7 +1,7 @@
 {{-- File ini berisi formulir untuk satu tim --}}
 {{-- Variabel $team_index akan dikirim dari view utama --}}
 
-<div class="member-card bg-white">
+<div class="member-card bg-white text-black">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div>
             <label for="team_{{ $team_index }}_nama" class="block text-sm font-medium text-gray-700 mb-1">Nama Tim</label>

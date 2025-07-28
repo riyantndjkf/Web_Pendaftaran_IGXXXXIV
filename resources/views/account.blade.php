@@ -1,19 +1,7 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Industrial Games - Akun Tim</title>
+@extends("layouts.app")
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=figtree:400,600&display=swap" rel="stylesheet" />
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Styles -->
-    @vite('resources/css/app.css')
-
-    <style>
+@section("content")
+  <style>
         body {
             font-family: 'Poppins', sans-serif;
             padding-top: 56px; /* Sesuaikan dengan tinggi header fixed */
@@ -32,24 +20,9 @@
             background: #a0aec0;
         }
     </style>
-</head>
 <body class="bg-[#14191A] text-white">
 
-    <!-- Header / Navigation Bar (Konsisten dengan halaman lain) -->
-   <header class="bg-[#0D1B2E] py-2 px-4 fixed top-0 left-0 right-0 z-50">
-        <nav class="flex justify-between items-center">
-            <!-- PERUBAHAN DI SINI: Mengganti teks dengan gambar logo -->
-            <div class="flex items-center">
-                <img src="{{ asset('images/Logo_Industrial_Games.png') }}" alt="Industrial Games Logo" class="h-12 w-auto">
-            </div>
-            <ul class="flex space-x-10 ml-auto">
-                <li><a href="{{ url('/') }}" class="hover:text-gray-300 font-bold">HOME</a></li>
-                <li><a href="{{ url('/aboutus') }}" class="hover:text-gray-300 font-bold">ABOUT US</a></li>
-                <li><a href="{{ url('/faq') }}" class="hover:text-gray-300 font-bold">FAQ</a></li>
-                <li><a href="{{ url('/account') }}" class="hover:text-gray-300 font-bold border border-gray-500 px-3 py-1 rounded-md bg-gray-500">ACCOUNT</a></li>
-            </ul>
-        </nav>
-    </header>
+   
 
     <!-- Account Section -->
    <section class="relative py-16 px-4 flex flex-col items-center justify-center min-h-screen" style="background-image: url('{{ asset('images/Background_Industrial_Games.png') }}'); background-size: cover; background-position: center; background-attachment: fixed;">
@@ -63,7 +36,7 @@
                 <div class="bg-gray-700 p-4 rounded-md shadow-inner">
                     <p class="text-gray-300 text-lg">Nama Tim:</p>
                     {{-- Mengambil nama tim dari variabel $teamData --}}
-                    <p class="text-white text-2xl font-semibold">{{ $teamData['team_name'] ?? 'Nama Tim Belum Tersedia' }}</p>
+                    <p class="text-white text-2xl font-semibold">{{ $team->nama_tim ?? 'Nama Tim Belum Tersedia' }}</p>
                 </div>
 
                 <!-- Data Peserta -->
@@ -71,8 +44,8 @@
                     <p class="text-gray-300 text-lg mb-2">Nama Peserta:</p>
                     <ul class="list-disc list-inside text-white text-xl ml-4 space-y-1">
                         {{-- Melakukan loop untuk setiap peserta --}}
-                        @forelse($teamData['participants'] ?? [] as $participant)
-                            <li>{{ $participant }}</li>
+                       @forelse ($team?->members ?? [] as $anggota)
+                            <li>{{ $anggota->nama_lengkap }}</li>
                         @empty
                             <li>Data Peserta Belum Tersedia</li>
                         @endforelse
@@ -83,11 +56,11 @@
                 <div class="bg-gray-700 p-4 rounded-md shadow-inner">
                     <p class="text-gray-300 text-lg">Status Pembayaran:</p>
                     {{-- Menyesuaikan warna teks berdasarkan status pembayaran --}}
-                    @php
-                        $paymentStatus = $teamData['payment_status'] ?? 'Belum Diketahui';
-                        $paymentColorClass = ($paymentStatus == 'Sudah Bayar') ? 'text-green-400' : 'text-red-400';
-                    @endphp
-                    <p class="{{ $paymentColorClass }} text-2xl font-bold">{{ $paymentStatus }}</p>
+                     @if ($team->ver_bukti_bayar)
+                        <p class="text-green-400 text-2xl font-bold">Sudah Bayar</p>
+                    @else
+                        <p class="text-red-400 text-2xl font-bold">Belum Bayar</p>
+                    @endif
                 </div>
             </div>
 
@@ -96,6 +69,12 @@
                     Kembali ke Dashboard
                 </a>
             </div>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 mt-4">
+                    Logout
+                </button>
+            </form>
         </div>
     </section>
 
@@ -135,4 +114,5 @@
     </footer>
 
 </body>
-</html>
+@endsection
+  
