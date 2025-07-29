@@ -89,14 +89,30 @@ Route::group([
     Route::post('/rally2/question/{id}/submit', [R2Controller::class, 'submitQR'])
         ->name('question.submit');
 
+    Route::get('/claim-envelope/{id}', [R2Controller::class, 'claim'])
+        ->middleware('cek.claim.envelope')->name('rally-2.claim-envelope');
+
     Route::get('/rally2/qr-redirect/{id}', function ($id) {
         session()->put("akses_soal_$id", true);
-        return redirect()->route('rally-2.question', $id);
+        return redirect()->route('peserta.rally-2.question', $id);
+
+    Route::get('/envelope-redirect/{id}', function ($id) {
+        session()->put("akses_envelope_$id", true);
+        return redirect()->route('peserta.rally-2.claim-envelope', $id);
+    });
     });
 
-    Route::get('/rally-2/{id}', function ($id) {
+    Route::get('/rally2/{id}', function ($id) {
         if (is_numeric($id)) {
-            return redirect("/rally-2/qr-redirect/$id");
+            return redirect("peserta/rally2/qr-redirect/$id");
+        }
+
+        abort(404);
+    });
+
+    Route::get('/mystery-envelope/{id}', function ($id) {
+        if (is_numeric($id)) {
+            return redirect("peserta/rally2/envelope-redirect/$id");
         }
 
         abort(404);

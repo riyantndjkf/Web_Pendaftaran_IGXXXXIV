@@ -5,6 +5,12 @@
 @section('content')
     <div class="flex items-center justify-center min-h-screen px-6 py-8">
         <div class="bg-white rounded-2xl p-8 w-full max-w-md mx-auto shadow-2xl">
+            @if ($pernahAkses)
+                <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded-lg text-center font-semibold">
+                    ⚠️ Kamu sudah pernah mengakses soal ini sebelumnya.
+                </div>
+            @endif
+
             <div class="text-left mb-6">
                 <span class="text-4xl font-bold text-green-600">${{ $soal->reward_amount }}</span>
             </div>
@@ -111,6 +117,7 @@
 
     <script>
         let selectedOption = null;
+        let jawabanSudahDikirim = false;
 
         function selectOption(button) {
             document.querySelectorAll('button[onclick*="selectOption"]').forEach(btn => {
@@ -134,10 +141,18 @@
         document.addEventListener('DOMContentLoaded', function () {
             const input = document.getElementById('jawabanInput');
 
-            input.addEventListener('input', function () {
-                // Ganti koma dengan titik secara otomatis
-                input.value = input.value.replace(',', '.');
-            });
+            if (input) {
+                input.addEventListener('input', function () {
+                    // Ganti koma dengan titik
+                    input.value = input.value.replace(',', '.');
+                });
+            }
+
+            window.addEventListener('beforeunload', function (e) {
+                if (!jawabanSudahDikirim) {
+                    e.preventDefault();
+                    e.returnValue = ''; // WAJIB untuk memunculkan prompt konfirmasi
+                }
         });
 
         /* Fungsi dibawah sebenernya mau dipake tapi tabrakan sama input desimal :(
@@ -203,7 +218,7 @@
             }
 
             try {
-                const response = await fetch("{{ route('question.submit', $soal->id) }}", {
+                const response = await fetch("{{ route('peserta.question.submit', $soal->id) }}", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -225,6 +240,8 @@
                 } else {
                     showModal('wrongModal');
                 }
+
+                jawabanSudahDikirim = true;
 
             } catch (error) {
                 console.error("Error saat submit:", error);
@@ -264,7 +281,7 @@
                 document.getElementById('submitBtn').disabled = true;
             }
 
-            window.location.href = '/rally-2/scanner';
+            window.location.href = '/peserta/rally2/scanner';
         }
 
         window.onclick = function (event) {

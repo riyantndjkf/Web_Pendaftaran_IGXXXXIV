@@ -565,7 +565,67 @@ class SoalQrSeeder extends Seeder
                 'option_4' => null,
                 'jawaban_benar' => '0.75',
                 'gambar_soal' => null
-            ]
+            ],
+            [
+                'id' => 47,
+                'level' => '3',
+                'pertanyaan' => 'Diberikan suatu trapesium \(ABCD\) dengan \( AB \; \text{sejajar} \; CD \). Misalkan titik \(P\) dan \(Q\) berturut-turut pada \(AD\) dan \(BC\) sedemikian sehingga\( PQ \; \text{sejajar} \; AB \) dan membagi trapesium menjadi dua bagian yang sama luasnya. Jika \(AB = 17\) dan \(CD = 7\), maka nilai \(PQ\) adalah...',
+                'reward_amount'=> 3000,
+                'option_1' => '10',
+                'option_2' => '12',
+                'option_3' => '13',
+                'option_4' => '15',
+                'jawaban_benar' => '13',
+                'gambar_soal' => null
+            ],
+            [
+                'id' => 48,
+                'level' => '3',
+                'pertanyaan' => 'Jika vektor \\( \\mathbf{a} = (2, -1) \\) dan vektor \\( \\mathbf{b} = (3, 4) \\), hasil dari vektor \\( 2\\mathbf{a} + \\mathbf{b} \\) adalah...',
+                'reward_amount'=> 1200,
+                'option_1' => '\\( (5, 3) \\)',
+                'option_2' => '\\( (8, -1) \\)',
+                'option_3' => '\\( (6, -4) \\)',
+                'option_4' => '\\( (7, 2) \\)',
+                'jawaban_benar' => '(7,2)',
+                'gambar_soal' => null
+            ],
+            [
+                'id' => 49,
+                'level' => '3',
+                'pertanyaan' => 'Jika vektor \\( \\mathbf{a} = (2, -1) \\) dan vektor \\( \\mathbf{b} = (3, 4) \\), hasil dari vektor \\( 2\\mathbf{a} + \\mathbf{b} \\) adalah...',
+                'reward_amount'=> 1200,
+                'option_1' => '\\( (5, 3) \\)',
+                'option_2' => '\\( (8, -1) \\)',
+                'option_3' => '\\( (6, -4) \\)',
+                'option_4' => '\\( (7, 2) \\)',
+                'jawaban_benar' => '(7,2)',
+                'gambar_soal' => null
+            ],
+            [
+                'id' => 50,
+                'level' => '3',
+                'pertanyaan' => 'Jika vektor \\( \\mathbf{a} = (2, -1) \\) dan vektor \\( \\mathbf{b} = (3, 4) \\), hasil dari vektor \\( 2\\mathbf{a} + \\mathbf{b} \\) adalah...',
+                'reward_amount'=> 1200,
+                'option_1' => '\\( (5, 3) \\)',
+                'option_2' => '\\( (8, -1) \\)',
+                'option_3' => '\\( (6, -4) \\)',
+                'option_4' => '\\( (7, 2) \\)',
+                'jawaban_benar' => '(7,2)',
+                'gambar_soal' => null
+            ],
+            [
+                'id' => 51,
+                'level' => '3',
+                'pertanyaan' => 'Jika vektor \\( \\mathbf{a} = (2, -1) \\) dan vektor \\( \\mathbf{b} = (3, 4) \\), hasil dari vektor \\( 2\\mathbf{a} + \\mathbf{b} \\) adalah...',
+                'reward_amount'=> 1200,
+                'option_1' => '\\( (5, 3) \\)',
+                'option_2' => '\\( (8, -1) \\)',
+                'option_3' => '\\( (6, -4) \\)',
+                'option_4' => '\\( (7, 2) \\)',
+                'jawaban_benar' => '(7,2)',
+                'gambar_soal' => null
+            ],
         ]);
     }
 }

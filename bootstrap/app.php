@@ -14,6 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
          $middleware->alias([
         'role' => \App\Http\Middleware\RoleMiddleware::class,
         'cek.routing.peserta' => \App\Http\Middleware\CekRoutingPeserta::class,
+        'cek.soal.qr' => \App\Http\Middleware\CekAksesSoal::class,
+        'cek.claim.envelope' => \App\Http\Middleware\CekAksesEnvelope::class,
     ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

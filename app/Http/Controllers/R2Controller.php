@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Support\Facades\Log;
+use App\Models\SoalQR;
+use App\Models\MysteryEnvelope;
 use App\Models\Team;
 use Illuminate\Support\Facades\Auth;
 
@@ -95,21 +98,28 @@ public function index(Request $request)
         return view('peserta.rally-2.question');
     }
 
-
-
     //SOAL QR
     public function showQR($id)
     {
+        // Cegah akses tanpa QR
         if (!session()->get("akses_soal_$id")) {
-            abort(403, "Akses soal hanya bisa dilakukan melalui QR scan.");
+            abort(403, "Akses soal hanya bisa dilakukan melalui QR Scan.");
         }
 
         $soal = SoalQR::findOrFail($id);
-        return view('rally-2.question', compact('soal'));
+
+        // Cek apakah peserta sudah pernah membuka soal ini sebelumnya
+        $pernahAkses = session()->get("pernah_akses_$id", false);
+
+        // Tandai bahwa soal sudah pernah diakses
+        session()->put("pernah_akses_$id", true);
+
+        return view('peserta.rally-2.question', compact('soal', 'pernahAkses'));
     }
 
     public function submitQR(Request $request, $id)
     {
+        Log::info("ID Soal : " . $id);
         $soal = SoalQR::findOrFail($id);
 
         // Fungsi normalisasi jawaban
@@ -137,5 +147,32 @@ public function index(Request $request)
             'status' => $status,
             'reward' => $status === 'benar' ? $soal->reward_amount : null
         ]);
+    }
+
+    // MYSTERY ENVELOPE
+    public function claim($id)
+    {
+        // Batasi hanya lewat scan (opsional, seperti soal)
+        if (!session()->get("akses_envelope_$id")) {
+            abort(403, "Akses hanya bisa dilakukan melalui QR Scan.");
+        }
+
+        $envelope = MysteryEnvelope::where('id', $id)->first();
+
+        if (!$envelope) {
+            abort(404, "Envelope tidak ditemukan.");
+        }
+
+        // Cek apakah tim sudah klaim sebelumnya (opsional)
+        if ($envelope->tTeam_id) {
+            return redirect()
+                ->route('peserta.rally-2.scanner') // ganti ini dengan rute tempat peserta diarahkan kembali
+                ->with('error', 'Envelope ini sudah diklaim oleh tim lain.');
+        }
+
+        // Simpan ke log atau tandai sebagai sudah diklaim (opsional)
+
+        // Kirim tampilan reward
+        return view('peserta.rally-2.claim-envelope', compact('envelope'));
     }
 }
