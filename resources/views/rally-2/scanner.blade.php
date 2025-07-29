@@ -33,10 +33,16 @@
                                     qrReader.stop().then(() => {
                                         console.log("QR Code Detected:", qrCodeMessage);
 
-                                        if (/^\d+$/.test(qrCodeMessage)) {
+                                        if (/^M-\d+$/.test(qrCodeMessage)) {
+                                            // QR untuk Mystery Envelope
+                                            const id_envelope = qrCodeMessage.split('-')[1];
+                                            window.location.href = `/mystery-envelope/${id_envelope}`;
+                                        } else if (/^\d+$/.test(qrCodeMessage)) {
+                                            // QR untuk Soal
                                             const id_soal = qrCodeMessage;
                                             window.location.href = `${id_soal}`;
                                         } else {
+                                            // Format tidak dikenali
                                             document.getElementById("qr-reader-results").innerText = "QR tidak valid!";
                                         }
                                     }).catch(err => {

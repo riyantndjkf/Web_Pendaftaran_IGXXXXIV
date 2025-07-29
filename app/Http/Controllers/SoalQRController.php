@@ -10,12 +10,20 @@ class SoalQRController extends Controller
 {
     public function show($id)
     {
+        // Cegah akses tanpa QR
         if (!session()->get("akses_soal_$id")) {
-            abort(403, "Akses soal hanya bisa dilakukan melalui QR scan.");
+            abort(403, "Akses soal hanya bisa dilakukan melalui QR Scan.");
         }
 
         $soal = SoalQR::findOrFail($id);
-        return view('rally-2.question', compact('soal'));
+
+        // Cek apakah peserta sudah pernah membuka soal ini sebelumnya
+        $pernahAkses = session()->get("pernah_akses_$id", false);
+
+        // Tandai bahwa soal sudah pernah diakses
+        session()->put("pernah_akses_$id", true);
+
+        return view('rally-2.question', compact('soal', 'pernahAkses'));
     }
 
     public function submit(Request $request, $id)

@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
             'cek.soal.qr' => \App\Http\Middleware\CekAksesSoal::class,
+            'cek.claim.envelope' => \App\Http\Middleware\CekAksesEnvelope::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

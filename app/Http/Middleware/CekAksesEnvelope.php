@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class CekAksesSoal
+class CekAksesEnvelope
 {
     /**
      * Handle an incoming request.
@@ -16,8 +16,8 @@ class CekAksesSoal
     public function handle(Request $request, Closure $next): Response
     {
         $id = $request->route('id');
-        if (!session()->has("akses_soal_$id")) {
-            abort(403, 'Akses soal hanya bisa dilakukan melalui QR Scan.');
+        if (!session()->has("akses_envelope_$id")) {
+            abort(403, 'Claim envelope hanya bisa dilakukan melalui QR Scan.');
         }
 
         return $next($request);
