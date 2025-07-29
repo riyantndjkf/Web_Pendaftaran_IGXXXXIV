@@ -12,6 +12,10 @@ return new class extends Migration
             // Kolom ini bisa null karena hanya tim pertama dari bundle yang akan mengisinya
             $table->string('foto_bukti_pembayaran')->nullable()->after('asal_sekolah');
             $table->boolean('ver_bukti_bayar')->default(false);
+            $table->integer('total_uang_babak2')->default(100000);
+            $table->integer('poin_total_babak2')->nullable();
+            $table->integer('current_session_babak2')->default(1);           
+            $table->boolean("unlocked_babak2")->default(0); 
         });
     }
 

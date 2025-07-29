@@ -14,8 +14,8 @@ class MachineSeeder extends Seeder
     public function run(): void
     {
         Machine::create([
-            'name' => 'Mesin Pemotong & Bending Pipa',
-            'jenis' => 'Memotong pipa baja/aluminium dan membentuknya sesuai bentuk rangka (frame).',
+            'name' => 'Cutting',
+            'jenis' => '1',
             'harga_dasar' => 3000,
             'kapasitas_dasar' => 5,
             'base_time' => 5, // dalam menit
@@ -23,8 +23,8 @@ class MachineSeeder extends Seeder
         ]);
 
         Machine::create([
-            'name' => 'Mesin las otomatis',
-            'jenis' => 'Menggabungkan pipa-pipa menjadi rangka sepeda dengan pengelasan.',
+            'name' => 'Welding',
+            'jenis' => '2',
             'harga_dasar' => 4000,
             'kapasitas_dasar' => 10,
             'base_time' => 7, // dalam menit
@@ -32,8 +32,8 @@ class MachineSeeder extends Seeder
         ]);
 
         Machine::create([
-            'name' => 'Mesin pengecatan & Oven',
-            'jenis' => 'Memberi warna dan pelindung pada rangka (coating + pengeringan).',
+            'name' => 'Painting',
+            'jenis' => '3',
             'harga_dasar' => 2500,
             'kapasitas_dasar' => 8,
             'base_time' => 6, // dalam menit
@@ -41,8 +41,8 @@ class MachineSeeder extends Seeder
         ]);
 
         Machine::create([
-            'name' => 'Mesin Perakitan',
-            'jenis' => 'Merakit seluruh bagian (rangka, roda, stang, rem, gear, sadel).',
+            'name' => 'Assembly',
+            'jenis' => '4',
             'harga_dasar' => 3000,
             'kapasitas_dasar' => 6,
             'base_time' => 4, // dalam menit

@@ -23,6 +23,7 @@ class DatabaseSeeder extends Seeder
        $this->call([
             SessionSeeder::class,
             MachineSeeder::class,
+            SoalQrSeeder::class,
     ]);
     }
 }

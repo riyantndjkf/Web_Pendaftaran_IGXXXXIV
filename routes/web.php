@@ -59,7 +59,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 });
 
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/home', [HomeController::class, 'index'])->name('home');
 
 Route::group([
     'middleware' => ['auth', 'role:peserta', 'cek.routing.peserta'], // ✅ tambahkan middleware di sini

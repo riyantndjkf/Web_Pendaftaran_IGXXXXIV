@@ -25,14 +25,14 @@ class SessionSeeder extends Seeder
             'id' => 2,
             'durasi' => 35,
             'demand' => 50,
-            'event' => 'Reward soal 1,5x',
+            'event' => 'reward_amount * 1.5',
         ]);
 
         Session::create([
             'id' => 3,
             'durasi' => 35,
             'demand' => 35,
-            'event' => 'Harga maintenance naik 1,5x',
+            'event' => 'maintenance * 1.5',
         ]);
 
         Session::create([

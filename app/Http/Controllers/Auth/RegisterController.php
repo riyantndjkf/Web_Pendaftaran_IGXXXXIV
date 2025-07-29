@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\Team;
+use App\Models\Tteam;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
 use Illuminate\Auth\Events\Registered;
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use App\Models\User;
+use Psy\Readline\Hoa\Console;
 
 class RegisterController extends Controller
 {
@@ -53,13 +55,15 @@ class RegisterController extends Controller
             $team = Team::create([
                 'nama_tim' => $request->nama_tim,
                 'password' => $request->password,
-                'asal_sekolah' => $request->asal_sekolah, // <-- TAMBAHAN
+                'asal_sekolah' => $request->asal_sekolah, 
+                'foto_bukti_pembayaran' => ""
             ]);
             User::create([
                 'name' => $request->nama_tim,
                 'role' => 'peserta',
                 'password' => bcrypt($request->password),
             ]);
+
 
             // Logika untuk anggota tetap sama
             foreach ($request->members as $index => $memberData) {
@@ -82,6 +86,7 @@ class RegisterController extends Controller
 
             DB::commit();
             event(new Registered($team));
+            
            return redirect()->route('register.success');
 
         } catch (\Throwable $th) {
