@@ -19,7 +19,7 @@ class Team extends Authenticatable
         'nama_tim',
         'password',
         'asal_sekolah',
-        'foto_bukti_pembayaran', // <-- TAMBAHKAN INI
+        'foto_bukti_pembayaran', 
     ];
 
     /**

@@ -4,7 +4,7 @@
 
 @section('content')
     <div class="flex justify-between items-center p-4 bg-yellow-600">
-        <div class="text-2xl font-bold text-black">{{ $gameData['timer'] }}</div>
+        <div id="gameTimer" class="text-2xl font-bold text-black">{{ $gameData['timer'] }}</div>
         <button onclick="toggleSideMenu()">
             <x-radix-text-align-justify class="w-10 h-10 text-black" />
         </button>
@@ -126,7 +126,38 @@
 
             areFactoriesLocked = false;
             updateLockedUI();
+
+            startCountUp(); // Mulai timer di sini
+
             alert('Factory unlocked successfully!');
         }
+    
+
+        //-----------------TIMER---------------------//
+        let startTime = "{{ $gameData['timer'] ?? '00:00' }}";
+        let [startMinutes, startSeconds] = startTime.split(':').map(Number);
+        let totalSeconds = startMinutes * 60 + startSeconds;
+
+        let timerInterval; // disimpan agar bisa dikontrol
+
+        function updateTimerUI() {
+            const timerElement = document.getElementById("gameTimer");
+            let minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+            let seconds = (totalSeconds % 60).toString().padStart(2, '0');
+            timerElement.textContent = `${minutes}:${seconds}`;
+        }
+
+        function startCountUp() {
+            timerInterval = setInterval(() => {
+                totalSeconds++;
+                updateTimerUI();
+            }, 1000);
+        }
+
+
+        document.addEventListener("DOMContentLoaded", () => {
+            updateLockedUI();
+            updateTimerUI(); // tampilkan timer awal meski belum jalan
+        });
     </script>
 @endpush

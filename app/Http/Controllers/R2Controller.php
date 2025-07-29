@@ -9,7 +9,7 @@ class R2Controller extends Controller
     public function index()
     {
         $gameData = [
-            'timer' => '25:33',
+            'timer' => '00:00',
             'demand' => [
                 'current' => 35,
                 'fulfilled' => 0
