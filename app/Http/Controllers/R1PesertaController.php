@@ -46,10 +46,10 @@ class R1PesertaController extends Controller
             return 1;
         }
 
-        $minutes = $start->diffInMinutes($now); 
+        $minutes = $start->diffInMinutes($now);
         $sesi = floor($minutes / 30) + 1;
 
-        return min($sesi, 4); 
+        return min($sesi, 4);
     }
 
 
@@ -62,34 +62,6 @@ class R1PesertaController extends Controller
             ->get();
 
         return view('pos_peserta', compact('id', 'komponen'));
-    }
-
-    public function klaimPos(Request $r, $id)
-    {
-        $tim = $this->getTim();
-        $komponen = $r->input('komponen');
-        $jumlah = (int) $r->input('jumlah');
-
-        $stok = DB::table('pos_stok')
-            ->where('pos_id', $id)
-            ->where('komponen', $komponen)
-            ->value('jumlah');
-
-        if ($stok < $jumlah) {
-            return back()->with('error', 'Stok tidak mencukupi');
-        }
-
-        DB::table('komponen')->updateOrInsert(
-            ['peserta_namaTim' => $tim],
-            [$komponen => DB::raw("COALESCE($komponen, 0) + $jumlah")]
-        );
-
-        DB::table('pos_stok')
-            ->where('pos_id', $id)
-            ->where('komponen', $komponen)
-            ->decrement('jumlah', $jumlah);
-
-        return back()->with('success', "Berhasil ambil $jumlah $komponen");
     }
 
     public function showAllPos()
@@ -152,6 +124,67 @@ class R1PesertaController extends Controller
         $harga = $this->sesiHarga[$sesi];
 
         return view('jual', compact('stok', 'sesi', 'harga'));
+    }
+
+    public function daftarPos()
+    {
+        $tim = session('namaTim') ?? 'TimDemo';
+
+        $posList = DB::table('pos')->get();
+        $riwayat = DB::table('riwayat_pos')
+            ->where('peserta_namaTim', $tim)
+            ->orderByDesc('waktu')
+            ->limit(3)
+            ->pluck('pos_id')
+            ->toArray();
+
+        return view('peserta_pos', compact('posList', 'riwayat', 'tim'));
+    }
+
+    public function pergiKePos($id)
+    {
+        $tim = $this->getTim();
+
+        $lastVisited = DB::table('riwayat_pos')
+            ->where('peserta_namaTim', $tim)
+            ->orderByDesc('waktu')
+            ->limit(3)
+            ->pluck('pos_id')
+            ->toArray();
+
+        if (in_array($id, $lastVisited)) {
+            return back()->with('error', 'Tidak boleh mengunjungi pos yang sama sebelum mengunjungi 3 pos lain.');
+        }
+
+        $uang = DB::table('peserta')->where('namaTim', $tim)->value('uang');
+        if ($uang < 3) {
+            return back()->with('error', 'Uang tidak cukup.');
+        }
+        DB::table('peserta')->where('namaTim', $tim)->decrement('uang', 3);
+
+        DB::table('riwayat_pos')->insert([
+            'peserta_namaTim' => $tim,
+            'pos_id' => $id,
+            'waktu' => now()
+        ]);
+
+        $pos = DB::table('pos')->where('id', $id)->first();
+        if ($pos->tipe === 'single') {
+            DB::table('pos')->where('id', $id)->update(['status' => 'terisi']);
+        } else if ($pos->tipe === 'battle') {
+            $existingCount = DB::table('riwayat_pos')
+                ->where('pos_id', $id)
+                ->whereDate('waktu', today())
+                ->count();
+
+            if ($existingCount == 1) {
+                DB::table('pos')->where('id', $id)->update(['status' => 'butuh_grup']);
+            } else if ($existingCount >= 2) {
+                DB::table('pos')->where('id', $id)->update(['status' => 'terisi']);
+            }
+        }
+
+        return back()->with('success', "Berhasil mengunjungi Pos $id");
     }
 
     public function jualSepeda(Request $r)

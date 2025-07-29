@@ -1,48 +1,72 @@
-    <!DOCTYPE html>
-    <html>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IGBike Home</title>
+    <style>
+        .kosong { background-color: #c8e6c9; }       /* Hijau */
+        .butuh_grup { background-color: #fff9c4; }   /* Kuning */
+        .terisi { background-color: #ffcdd2; }       /* Merah */
+        td, th { padding: 8px 12px; }
+        form { margin: 0; }
+        button[disabled] { opacity: 0.6; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <h1>Selamat Datang di IGBike</h1>
 
-    <head>
-        <title>IGBike Home</title>
-    </head>
+    @php
+        use Illuminate\Support\Facades\DB;
 
-    <body>
-        <h1>Selamat Datang di IGBike</h1>
-
-        @php
         $tim = session('namaTim') ?? 'TimDemo';
         $uang = DB::table('peserta')->where('namaTim', $tim)->value('uang') ?? 0;
-        @endphp
+        $posList = DB::table('pos')->get();
 
-        <h3>Halo {{ $tim }}!</h3>
-        <p>💰 Uang saat ini: <strong>{{ $uang }}</strong></p>
+        // Ambil 3 kunjungan terakhir tim ini
+        $riwayat = DB::table('riwayat_pos')
+            ->where('peserta_namaTim', $tim)
+            ->orderByDesc('waktu')
+            ->limit(3)
+            ->pluck('pos_id')
+            ->toArray();
+    @endphp
 
-        @section('content')
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-8">
-                    <div class="card">
-                        <div class="card-header">{{ __('Dashboard') }}</div>
+    <h3>Halo {{ $tim }}!</h3>
+    <p>💰 Uang saat ini: <strong>${{ $uang }}</strong></p>
 
-                        <div class="card-body">
-                            @if (session('status'))
-                            <div class="alert alert-success" role="alert">
-                                {{ session('status') }}
-                            </div>
-                            @endif
+    <p>Pilih Halaman:</p>
+    <ul>
+        <li><a href="/produksi">Rakit Sepeda</a></li>
+        <li><a href="/jual">Jual Sepeda</a></li>
+    </ul>
 
-                            {{ __('You are logged in!') }}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        @endsection
-        <p>Pilih Halaman:</p>
-        <ul>
-            <li><a href="{{ route('pos.show', 1) }}">Pos 1</a></li>
-            <li><a href="{{ route('pos.show', 2) }}">Pos 2</a></li>
-            <li><a href="{{ route('pos.show', 3) }}">Pos 3</a></li>
-            <li><a href="/produksi">Rakit Sepeda</a></li>
-            <li><a href="/jual">Jual Sepeda</a></li>
-        </ul>
-    </body>
+    <hr>
+    <h3>Status Seluruh Pos</h3>
+    <table border="1" cellspacing="0">
+        <tr>
+            <th>Pos</th>
+            <th>Status</th>
+            <th>Aksi</th>
+        </tr>
+        @foreach ($posList as $pos)
+            @php
+                $sudahDikunjungiBaruBaruIni = in_array($pos->id, $riwayat);
+            @endphp
+            <tr class="{{ $pos->status }}">
+                <td>{{ $pos->nama }}</td>
+                <td><strong>{{ ucfirst(str_replace('_', ' ', $pos->status)) }}</strong></td>
+                <td>
+                    <form action="{{ route('peserta.pos.pergi', $pos->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" {{ $sudahDikunjungiBaruBaruIni ? 'disabled' : '' }}>
+                            Pergi ke Pos
+                        </button>
+                        @if ($sudahDikunjungiBaruBaruIni)
+                            <small>(Sudah dikunjungi, harus ke 3 pos lain dulu)</small>
+                        @endif
+                    </form>
+                </td>
+            </tr>
+        @endforeach
+    </table>
+</body>
+</html>

@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             KomponenSeeder::class,
             SepedaSeeder::class,
             PoinBabak1Seeder::class,
+            PosSeeder::class,
             PosStokSeeder::class,
         ]);
     }

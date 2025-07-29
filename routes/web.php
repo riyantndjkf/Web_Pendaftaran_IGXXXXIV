@@ -8,11 +8,16 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
+Route::get('/admin/pos', [R1AdminController::class, 'overview'])->name('admin.overview');
 Route::get('/admin/pos/{id}', [R1AdminController::class, 'index'])->name('admin.pos');
-Route::post('/admin/pos/{id}/tambah', [R1AdminController::class, 'tambahKomponen'])->name('admin.tambah');
+Route::post('/admin/pos/{id}/beri', [R1AdminController::class, 'beriKomponen'])->name('admin.beri');
+Route::post('/admin/pos/{id}/status', [R1AdminController::class, 'updateStatus'])->name('admin.status');
+Route::post('/admin/pos/{id}/gagal', [R1AdminController::class, 'tandaiGagal'])->name('admin.gagal');
+
 
 Route::get('/pos/{id}', [R1PesertaController::class, 'showPos'])->name('pos.show');
-Route::post('/pos/{id}/klaim', [R1PesertaController::class, 'klaimPos'])->name('pos.klaim');
+Route::get('/peserta/pos', [R1PesertaController::class, 'daftarPos'])->name('peserta.pos');
+Route::post('/peserta/pos/{id}/pergi', [R1PesertaController::class, 'pergiKePos'])->name('peserta.pos.pergi');
 
 Route::get('/produksi', [R1PesertaController::class, 'showProduksi'])->name('produksi');
 Route::post('/produksi/{jenis}', [R1PesertaController::class, 'produksiSepeda'])->name('produksi.sepeda');
@@ -23,6 +28,3 @@ Route::post('/jual', [R1PesertaController::class, 'jualSepeda'])->name('jual.sep
 Route::get('/admin', function () {
     return view('home_admin');
 })->name('admin.home');
-
-
-?>
