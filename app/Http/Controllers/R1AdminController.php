@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class AdminPosController extends Controller
+class R1AdminController extends Controller
 {
     public function index($id)
     {

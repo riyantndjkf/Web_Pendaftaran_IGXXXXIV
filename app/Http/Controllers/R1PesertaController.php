@@ -8,7 +8,7 @@ use Carbon\Carbon;
 use App\Http\Controllers\Controller;
 
 
-class GameController extends Controller
+class R1PesertaController extends Controller
 {
     private $sesiHarga = [
         1 => ['city' => 40, 'folding' => 75, 'mountain' => 60],
