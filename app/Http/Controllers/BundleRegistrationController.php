@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
-
+use App\Models\User;
 class BundleRegistrationController extends Controller
 {
     /**
@@ -70,7 +70,11 @@ class BundleRegistrationController extends Controller
                 }
 
                 $team = Team::create($teamCreateData);
-                
+                User::create([
+                    'name' => $teamData['nama_tim'],
+                    'role' => 'peserta',
+                    'password' => bcrypt($teamData['password']),
+                ]);
                 // 5. Proses anggota tim seperti biasa
                 foreach ($teamData['members'] as $memberKey => $memberData) {
                     $file = $memberData['kartu_pelajar'];

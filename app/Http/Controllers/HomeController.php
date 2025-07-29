@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Auth;
+use App\Models\Team;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -23,6 +24,15 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        return view('peserta.home');
+    }
+
+    public function account()
+    {
+        $user = Auth::user();        
+        $team = Team::with('members')->find($user->id);
+        return view('peserta.account', [
+            'team' => $team
+        ]);
     }
 }

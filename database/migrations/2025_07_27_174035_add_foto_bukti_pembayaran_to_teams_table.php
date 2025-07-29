@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::table('teams', function (Blueprint $table) {
             // Kolom ini bisa null karena hanya tim pertama dari bundle yang akan mengisinya
             $table->string('foto_bukti_pembayaran')->nullable()->after('asal_sekolah');
+            $table->boolean('ver_bukti_bayar')->default(false);
         });
     }
 
@@ -18,6 +19,7 @@ return new class extends Migration
     {
         Schema::table('teams', function (Blueprint $table) {
             $table->dropColumn('foto_bukti_pembayaran');
+            $table->boolean('ver_bukti_bayar')->default(false);
         });
     }
 };

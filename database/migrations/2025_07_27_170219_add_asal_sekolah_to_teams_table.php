@@ -11,6 +11,7 @@ return new class extends Migration
         Schema::table('teams', function (Blueprint $table) {
             // Menambahkan kolom setelah kolom password
             $table->string('asal_sekolah')->after('password');
+            
         });
     }
 
