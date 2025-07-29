@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\R1Controller;
 use App\Http\Controllers\R2Controller;
 use App\Http\Controllers\RallyGames;
 use App\Http\Controllers\SoalQRController;
@@ -100,4 +101,9 @@ Route::group([
 
         abort(404);
     });
+
+    // =================== RALLY 1===================
+    Route::get('/rally1', [R1Controller::class, 'index'])->name('rally-1.index');
+
+
 });
