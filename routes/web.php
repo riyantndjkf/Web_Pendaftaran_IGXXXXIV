@@ -1,19 +1,23 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\GameController;
+use App\Http\Controllers\AdminPosController;
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('home');
+})->name('home');
 
-Auth::routes();
+Route::get('/admin/pos/{id}', [AdminPosController::class, 'index'])->name('admin.pos');
+Route::post('/admin/pos/{id}/tambah', [AdminPosController::class, 'tambahKomponen'])->name('admin.tambah');
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/pos/{id}', [GameController::class, 'showPos'])->name('pos.show');
+Route::post('/pos/{id}/klaim', [GameController::class, 'klaimPos'])->name('pos.klaim');
 
-Auth::routes();
+Route::get('/produksi', [GameController::class, 'showProduksi'])->name('produksi');
+Route::post('/produksi/{jenis}', [GameController::class, 'produksiSepeda'])->name('produksi.sepeda');
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::get('/jual', [GameController::class, 'showJual'])->name('jual');
+Route::post('/jual', [GameController::class, 'jualSepeda'])->name('jual.sepeda');
 
-Auth::routes();
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+?>
