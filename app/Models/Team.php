@@ -19,7 +19,9 @@ class Team extends Authenticatable
         'nama_tim',
         'password',
         'asal_sekolah',
-        'foto_bukti_pembayaran', 
+        'foto_bukti_pembayaran',  
+        'unlocked_babak2',
+        'total_uang_babak2',
     ];
 
     /**

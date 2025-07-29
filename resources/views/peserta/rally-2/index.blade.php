@@ -3,8 +3,9 @@
 @section('title', 'Rally 2')
 
 @section('content')
+
     <div class="flex justify-between items-center p-4 bg-yellow-600">
-        <div id="gameTimer" class="text-2xl font-bold text-black">{{ $gameData['timer'] }}</div>
+        <div class="text-2xl font-bold text-black">RALLY 2</div>
         <button onclick="toggleSideMenu()">
             <x-radix-text-align-justify class="w-10 h-10 text-black" />
         </button>
@@ -36,22 +37,25 @@
 
         <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-40">
             <img src="{{ asset('icons/rantai1.svg') }}" alt="Rantai 1"
-                class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 -rotate-90 w-[150%] h-auto object-cover opacity-70"
-                style="max-width: 150%; max-height: 150%;">
+                class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 -rotate-90 w-[150%] h-auto object-cover opacity-70">
             <img src="{{ asset('icons/rantai2.svg') }}" alt="Rantai 2"
-                class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 rotate-90 w-[150%] h-auto object-cover opacity-70"
-                style="max-width: 150%; max-height: 150%;">
+                class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 rotate-90 w-[150%] h-auto object-cover opacity-70">
         </div>
 
-        <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 z-50">
-            <img src="{{ asset('icons/icon_lock.svg') }}" alt="icon lock">
-            {{-- Buat aja kondisi untuk tampilin button maintenancenya --}}
-            <button onclick="showUnlockModal()"
-                class="bg-green-500 text-white px-6 text-3xl py-2 rounded-md font-bold hover:bg-green-600 transition">
-                UNLOCK
-                {{-- ganti jadi ini kalo maintenance --}}
-                {{-- MAINTENANCE --}}
-            </button>
+        <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 z-50 pointer-events-auto">
+            @if ($gameData['status_maintenance'] ?? false)
+                <img src="{{ asset('icons/icon_maintenance.svg') }}" alt="icon maintenance">
+                <button disabled
+                    class="bg-gray-400 text-white px-6 text-3xl py-2 rounded-md font-bold cursor-not-allowed">
+                    MAINTENANCE
+                </button>
+            @else
+                <img src="{{ asset('icons/icon_lock.svg') }}" alt="icon lock">
+                <button onclick="showUnlockModal()"
+                    class="bg-green-500 text-white px-6 text-3xl py-2 rounded-md font-bold hover:bg-green-600 transition">
+                    UNLOCK
+                </button>
+            @endif
         </div>
     </div>
 
@@ -63,8 +67,6 @@
                 <h3 class="text-2xl font-bold text-black mb-4">UNLOCK FACTORY?</h3>
                 <div class="flex justify-center">
                     <img src="{{ asset('icons/icon_key.svg') }}" alt="Icon Kunci" />
-                    {{-- Ini icon kalo dibagian maintenance --}}
-                    {{-- <img src="{{ asset('icons/icon_maintenance.svg') }}" alt="Icon Maintenance" /> --}}
                 </div>
                 <div class="text-green-600 font-bold text-xl mb-4">${{ number_format($gameData['unlock_cost']) }}</div>
                 <div class="flex space-x-3">
@@ -76,88 +78,88 @@
             </div>
         </div>
     </div>
+
 @endsection
 
 @push('scripts')
-    <script>
-        window.Laravel = {
-            csrfToken: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        };
+<script>
+    window.Laravel = {
+        csrfToken: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    };
 
-        let areFactoriesLocked = {{ ($gameData['factories_locked'] ?? true) ? 'true' : 'false' }};
+    let areFactoriesLocked = {{ ($gameData['factories_locked'] ?? true) ? 'true' : 'false' }};
 
-        function updateLockedUI() {
-            const lockedGroup = document.getElementById('lockedOverlayGroup');
-            const factoryItems = document.querySelectorAll('.factory-item');
+    function updateLockedUI() {
+        const lockedGroup = document.getElementById('lockedOverlayGroup');
+        const factoryItems = document.querySelectorAll('.factory-item');
 
-            if (!areFactoriesLocked) {
-                lockedGroup.classList.add('hidden');
-                factoryItems.forEach(item => {
-                    item.querySelector('div').classList.remove('opacity-50');
-                    item.querySelector('div').classList.remove('bg-gray-300');
-                    item.querySelector('div').classList.add('bg-white');
-                    item.dataset.unlocked = 'true';
-                });
-            } else {
-                lockedGroup.classList.remove('hidden');
-                factoryItems.forEach(item => {
-                    if (item.dataset.unlocked === 'false') {
-                        item.querySelector('div').classList.add('opacity-50');
-                        item.querySelector('div').classList.add('bg-gray-300');
-                        item.querySelector('div').classList.remove('bg-white');
-                    }
-                });
-            }
+        if (!areFactoriesLocked) {
+            lockedGroup.classList.add('hidden');
+            factoryItems.forEach(item => {
+                item.querySelector('div').classList.remove('opacity-50', 'bg-gray-300');
+                item.querySelector('div').classList.add('bg-white');
+                item.dataset.unlocked = 'true';
+            });
+        } else {
+            lockedGroup.classList.remove('hidden');
+            factoryItems.forEach(item => {
+                if (item.dataset.unlocked === 'false') {
+                    item.querySelector('div').classList.add('opacity-50', 'bg-gray-300');
+                    item.querySelector('div').classList.remove('bg-white');
+                }
+            });
+        }
+    }
+
+    function showUnlockModal() {
+        document.getElementById('unlockModal').classList.remove('hidden');
+    }
+
+    function hideUnlockModal() {
+        document.getElementById('unlockModal').classList.add('hidden');
+    }
+
+    function unlockFactory() {
+    fetch("{{ route('peserta.rally2.unlock') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": Laravel.csrfToken
+        },
+        body: JSON.stringify({})
+    })
+    .then(async response => {
+        const contentType = response.headers.get("content-type");
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText);
+        }
+        if (!contentType || !contentType.includes("application/json")) {
+            throw new Error("Server did not return JSON");
+        }
+        return response.json();
+    })
+    .then(data => {
+        hideUnlockModal();
+        areFactoriesLocked = false;
+        updateLockedUI();
+
+        // Update capital
+        const capitalElement = document.querySelector('div.text-right > .text-green-800');
+        if (capitalElement && data.capital !== undefined) {
+            capitalElement.textContent = '$' + Number(data.capital).toLocaleString();
         }
 
-        document.addEventListener('DOMContentLoaded', updateLockedUI);
+        alert(data.message);
+    })
+    .catch(err => {
+        console.error("Unlock error:", err);
+        alert("Error: " + err.message);
+    });
+}
 
-
-        function showUnlockModal() {
-            document.getElementById('unlockModal').classList.remove('hidden');
-        }
-
-        function hideUnlockModal() {
-            document.getElementById('unlockModal').classList.add('hidden');
-        }
-
-        function unlockFactory() {
-            hideUnlockModal();
-
-            areFactoriesLocked = false;
-            updateLockedUI();
-
-            startCountUp(); // Mulai timer di sini
-
-            alert('Factory unlocked successfully!');
-        }
-    
-
-        //-----------------TIMER---------------------//
-        let startTime = "{{ $gameData['timer'] ?? '00:00' }}";
-        let [startMinutes, startSeconds] = startTime.split(':').map(Number);
-        let totalSeconds = startMinutes * 60 + startSeconds;
-
-        let timerInterval; // disimpan agar bisa dikontrol
-
-        function updateTimerUI() {
-            const timerElement = document.getElementById("gameTimer");
-            let minutes = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
-            let seconds = (totalSeconds % 60).toString().padStart(2, '0');
-            timerElement.textContent = `${minutes}:${seconds}`;
-        }
-
-        function startCountUp() {
-            timerInterval = setInterval(() => {
-                totalSeconds++;
-                updateTimerUI();
-            }, 1000);
-        }
-
-
-        document.addEventListener("DOMContentLoaded", () => {
-            updateLockedUI();
-            updateTimerUI(); // tampilkan timer awal meski belum jalan
-        });
-    </script>
+    document.addEventListener("DOMContentLoaded", () => {
+        updateLockedUI();
+    });
+</script>
 @endpush

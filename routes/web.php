@@ -75,6 +75,8 @@ Route::group([
 
     // =================== RALLY 2 ===================
     Route::get('/rally2', [R2Controller::class, 'index'])->name('rally-2.index');
+    Route::post('/rally2/unlock', [R2Controller::class, 'unlockFactory'])->name('rally2.unlock');
+    
 
     Route::get('/rally2/scanner', [R2Controller::class, 'scanner'])->name('rally-2.scanner');
     Route::get('/rally2/events', [R2Controller::class, 'events'])->name('rally-2.events');

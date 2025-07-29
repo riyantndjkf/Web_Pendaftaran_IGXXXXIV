@@ -1,20 +1,29 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\Team;
+use Illuminate\Support\Facades\Auth;
 
 use Illuminate\Http\Request;
 
 class R2Controller extends Controller
 {
-    public function index()
+public function index(Request $request)
     {
+        $user = Auth::user();
+        $team = Team::where('nama_tim', $user->name)->firstOrFail();
+
         $gameData = [
             'timer' => '00:00',
+            // Get elapsed_seconds directly from the session
+            'elapsed_seconds' => session('rally2_timer', 0),
             'demand' => [
                 'current' => 35,
                 'fulfilled' => 0
             ],
-            'capital' => 100000,
+            'capital' => $team->total_uang_babak2,
+            'factories_locked' => !$team->unlocked_babak2,
+            'unlock_cost' => 100000,
             'factories' => [
                 ['unlocked' => true, 'active' => true, 'owned' => true, 'workers' => 5],
                 ['unlocked' => true, 'active' => true, 'owned' => true, 'workers' => 3],
@@ -31,22 +40,41 @@ class R2Controller extends Controller
                 ['unlocked' => false, 'active' => false],
                 ['unlocked' => false, 'active' => false],
                 ['unlocked' => false, 'active' => false],
-            ],
-            'unlock_cost' => 100000,
-            'show_unlock_modal' => false
+            ]
         ];
 
         return view('peserta.rally-2.index', compact('gameData'));
     }
 
-    public function unlock(Request $request)
+
+    public function unlockFactory(Request $request)
     {
+        $user = Auth::user();
+        $team = Team::where('nama_tim', $user->name)->firstOrFail();
+
+        $unlockCost = 100000;
+
+        if ($team->unlocked_babak2) {
+            return response()->json(['message' => 'Factory already unlocked.'], 400);
+        }
+
+        if ($team->total_uang_babak2 < $unlockCost) {
+            return response()->json(['message' => 'Not enough capital to unlock factory.'], 400);
+        }
+
+        $team->unlocked_babak2 = true;
+        $team->total_uang_babak2 -= $unlockCost;
+        $team->save();
+
+        session(['rally2_timer' => 0]); // Optional reset timer
+        session(['rally2_unlocked' => true]);
+
         return response()->json([
-            'success' => true,
-            'message' => 'Factory unlocked successfully!'
+            'message' => 'Factory unlocked successfully.',
+            'capital' => $team->total_uang_babak2
         ]);
     }
-
+   
     public function scanner()
     {
         return view('peserta.rally-2.scanner');
