@@ -39,10 +39,20 @@ class R1PesertaController extends Controller
 
     private function getSesiAktif()
     {
-        $start = Carbon::parse('2025-07-23 00:00:00');
-        $minute = Carbon::now()->diffInMinutes($start);
-        return min(4, floor($minute / 30) + 1);
+        $start = Carbon::parse('2025-07-29 10:00:00');
+        $now = Carbon::now();
+
+        if ($now->lessThan($start)) {
+            return 1;
+        }
+
+        $minutes = $start->diffInMinutes($now); 
+        $sesi = floor($minutes / 30) + 1;
+
+        return min($sesi, 4); 
     }
+
+
 
     public function showPos($id)
     {
@@ -161,6 +171,8 @@ class R1PesertaController extends Controller
             ['sepeda_komponen_peserta_namaTim1' => $tim],
             ['poin' => DB::raw("poin + $total"), 'sesi' => $sesi]
         );
+
+        DB::table('peserta')->where('namaTim', $tim)->increment('uang', $total);
 
         return back()->with('success', "Berhasil menjual. Pemasukan: $$total");
     }

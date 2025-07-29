@@ -1,3 +1,5 @@
+<h2>Produksi Sepeda</h2>
+
 @if (session('success'))
     <div style="color: green;">{{ session('success') }}</div>
 @endif
@@ -5,15 +7,31 @@
     <div style="color: red;">{{ session('error') }}</div>
 @endif
 
-<h2>Produksi Sepeda</h2>
 @foreach ($resep as $jenis => $syarat)
-    @php
-        $cukup = true;
-        foreach ($syarat as $k => $v) {
-            if (($data->$k ?? 0) < $v) $cukup = false;
-        }
-    @endphp
-    <form action="{{ route('produksi.sepeda', $jenis) }}" method="POST">@csrf
-        <button type="submit" {{ $cukup ? '' : 'disabled' }}>Rakit {{ ucfirst($jenis) }}</button>
-    </form>
+    <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 20px;">
+        <h3>{{ ucfirst($jenis) }} Bike</h3>
+
+        <ul>
+            @php $cukup = true; @endphp
+            @foreach ($syarat as $komponen => $jumlah)
+                @php
+                    $punya = $data->$komponen ?? 0;
+                    $status = $punya >= $jumlah ? '✅' : '❌';
+                    if ($punya < $jumlah) $cukup = false;
+                @endphp
+                <li>
+                    {{ $komponen }} × {{ $jumlah }}
+                    <span style="margin-left: 10px;">(You Have: {{ $punya }})</span>
+                    <strong>{{ $status }}</strong>
+                </li>
+            @endforeach
+        </ul>
+
+        <form action="{{ route('produksi.sepeda', $jenis) }}" method="POST">
+            @csrf
+            <button type="submit" {{ $cukup ? '' : 'disabled' }}>
+                🚲 Rakit {{ ucfirst($jenis) }}
+            </button>
+        </form>
+    </div>
 @endforeach

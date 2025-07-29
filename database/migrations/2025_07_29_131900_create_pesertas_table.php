@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('peserta', function (Blueprint $table) {
         $table->string('namaTim')->primary();
         $table->string('password', 8)->nullable();
-        $table->timestamps();
+        $table->integer('uang')->default(20); 
     });
     }
 

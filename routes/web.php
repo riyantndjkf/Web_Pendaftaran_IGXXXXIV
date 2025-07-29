@@ -20,4 +20,9 @@ Route::post('/produksi/{jenis}', [R1PesertaController::class, 'produksiSepeda'])
 Route::get('/jual', [R1PesertaController::class, 'showJual'])->name('jual');
 Route::post('/jual', [R1PesertaController::class, 'jualSepeda'])->name('jual.sepeda');
 
+Route::get('/admin', function () {
+    return view('home_admin');
+})->name('admin.home');
+
+
 ?>

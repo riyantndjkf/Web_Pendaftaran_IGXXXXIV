@@ -16,7 +16,6 @@ class PesertaSeeder extends Seeder
     DB::table('peserta')->insert([
         'namaTim' => 'TimDemo',
         'password' => null,
-        // kolom lain bisa null
     ]);
 }
 }
