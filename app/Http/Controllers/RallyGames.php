@@ -10,8 +10,8 @@ class RallyGames extends Controller
     public function index()
     {
         //normal
-        //babak_1
-        //babak_2
+        //rally-1
+        //rally-2
         // Cek jika belum login
         if (Auth::guest()) {
             return redirect()->route('login');
@@ -26,11 +26,11 @@ class RallyGames extends Controller
                     return redirect()->route('peserta.home')
                         ->with('error', 'Tunggu Lomba Dimulai Ya');
 
-                case 'babak_1':
-                    return view('peserta.babak_1.index');
+                case 'rally-1':
+                    return route('peserta.rally-1.index');
 
-                case 'babak_2':
-                    return view('peserta.babak_2.index');
+                case 'rally-2':
+                    return route('peserta.rally-2.index');
 
                 default:
                     return abort(403, 'Fase permainan tidak dikenali.');

@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\GameController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\R2Controller;
 use App\Http\Controllers\RallyGames;
+use App\Http\Controllers\SoalQRController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BundleRegistrationController;
 
@@ -56,13 +59,43 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 });
 
 
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::group([
-    'middleware' => ['auth', 'role:peserta'],
+    'middleware' => ['auth', 'role:peserta', 'cek.routing.peserta'], // ✅ tambahkan middleware di sini
     'prefix' => 'peserta',
     'as' => 'peserta.'
 ], function () {
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/accountdetail', [HomeController::class, 'account'])->name('account-detail');
     Route::get('/rally', [RallyGames::class, 'index'])->name('rally');
+
+
+
+
+    // =================== RALLY 2 ===================
+    Route::get('/rally2', [R2Controller::class, 'index'])->name('rally-2.index');
+
+    Route::get('/rally2/scanner', [R2Controller::class, 'scanner'])->name('rally-2.scanner');
+    Route::get('/rally2/events', [R2Controller::class, 'events'])->name('rally-2.events');
+    Route::get('/rally2/inventory', [R2Controller::class, 'inventory'])->name('rally-2.inventory');
+
+    Route::get('/rally2/question/{id}', [R2Controller::class, 'showQR'])
+        ->middleware('cek.soal.qr')->name('rally-2.question');
+
+    Route::post('/rally2/question/{id}/submit', [R2Controller::class, 'submitQR'])
+        ->name('question.submit');
+
+    Route::get('/rally2/qr-redirect/{id}', function ($id) {
+        session()->put("akses_soal_$id", true);
+        return redirect()->route('rally-2.question', $id);
+    });
+
+    Route::get('/rally-2/{id}', function ($id) {
+        if (is_numeric($id)) {
+            return redirect("/rally-2/qr-redirect/$id");
+        }
+
+        abort(404);
+    });
 });
