@@ -12,7 +12,7 @@
 
             {{-- Tombol scan lagi --}}
             <div class="mt-6">
-                <a href="{{ route('rally-2.scanner') }}"
+                <a href="{{ route('peserta.rally-2.scanner') }}"
                 class="inline-block bg-green-600 hover:bg-green-700 text-black font-semibold py-2 px-6 rounded-lg transition">
                     🔄 Scan Lagi
                 </a>

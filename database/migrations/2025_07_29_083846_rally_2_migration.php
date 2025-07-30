@@ -35,7 +35,7 @@ return new class extends Migration
         Schema::create('tsoalqr', function (Blueprint $table) {
             $table->id();
             $table->enum('level', ['1', '2', '3']);
-            $table->string('pertanyaan', 510);
+            $table->string('pertanyaan', 765);
             $table->integer('reward_amount');
             $table->string('option_1')->nullable();
             $table->string('option_2')->nullable();
