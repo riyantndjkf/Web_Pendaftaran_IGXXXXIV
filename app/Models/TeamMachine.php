@@ -6,17 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class TeamMachine extends Model
 {
-    use HasFactory;
-    protected $table = 'tTeamMachine';
-    protected $fillable = ['idTeam', 'idMachine', 'level', 'is_active', 'operator_hired'];
+    protected $table = 'tteammachine';
+    protected $fillable = ['team_id', 'tmachine_id', 'level', 'is_active', 'operater_hired'];
 
-    public function team()
-    {
-        return $this->belongsTo(Team::class, 'idTeam');
+    public function team() {
+        return $this->belongsTo(Team::class, 'team_id');
     }
 
-    public function machine()
-    {
-        return $this->belongsTo(Machine::class, 'idMachine');
+    public function machine() {
+        return $this->belongsTo(Machine::class, 'tmachine_id'); // gunakan nama kolom DB
     }
 }

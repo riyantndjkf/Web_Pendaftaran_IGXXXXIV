@@ -26,11 +26,11 @@ class CekRoutingPeserta
             // Validasi berdasarkan fase
             switch ($currentPhase) {
                 // Jika nanti aktifkan rally-1
-                // case 'rally-1':
-                //     if (!str_starts_with($path, 'peserta/rally1')) {
-                //         return redirect()->route('peserta.rally-1.index')->with('error', 'Hanya bisa mengakses Rally 1 saat ini.');
-                //     }
-                //     break;
+                 case 'rally-1':
+                     if (!str_starts_with($path, 'peserta/rally1')) {
+                         return redirect()->route('peserta.rally-1.index')->with('error', 'Hanya bisa mengakses Rally 1 saat ini.');
+                     }
+                     break;
 
                 case 'rally-2':
                     if (!str_starts_with($path, 'peserta/rally2')) {

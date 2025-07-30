@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\R1Controller;
 use App\Http\Controllers\R2Controller;
 use App\Http\Controllers\RallyGames;
 use App\Http\Controllers\SoalQRController;
@@ -75,27 +76,56 @@ Route::group([
 
     // =================== RALLY 2 ===================
     Route::get('/rally2', [R2Controller::class, 'index'])->name('rally-2.index');
-
+    Route::post('/rally2/unlock', [R2Controller::class, 'unlockFactory'])->name('rally2.unlock');
+    
+            //==================SIDEBAR======================
     Route::get('/rally2/scanner', [R2Controller::class, 'scanner'])->name('rally-2.scanner');
     Route::get('/rally2/events', [R2Controller::class, 'events'])->name('rally-2.events');
     Route::get('/rally2/inventory', [R2Controller::class, 'inventory'])->name('rally-2.inventory');
 
+
+            //==================SCANNER==========================
     Route::get('/rally2/question/{id}', [R2Controller::class, 'showQR'])
         ->middleware('cek.soal.qr')->name('rally-2.question');
 
     Route::post('/rally2/question/{id}/submit', [R2Controller::class, 'submitQR'])
         ->name('question.submit');
 
+    Route::get('/claim-envelope/{id}', [R2Controller::class, 'claim'])
+        ->middleware('cek.claim.envelope')->name('rally-2.claim-envelope');
+
     Route::get('/rally2/qr-redirect/{id}', function ($id) {
         session()->put("akses_soal_$id", true);
-        return redirect()->route('rally-2.question', $id);
+        return redirect()->route('peserta.rally-2.question', $id);
+
+    Route::get('/envelope-redirect/{id}', function ($id) {
+        session()->put("akses_envelope_$id", true);
+        return redirect()->route('peserta.rally-2.claim-envelope', $id);
+    });
     });
 
-    Route::get('/rally-2/{id}', function ($id) {
+    Route::get('/rally2/{id}', function ($id) {
         if (is_numeric($id)) {
-            return redirect("/rally-2/qr-redirect/$id");
+            return redirect("peserta/rally2/qr-redirect/$id");
         }
 
         abort(404);
     });
+
+    Route::get('/mystery-envelope/{id}', function ($id) {
+        if (is_numeric($id)) {
+            return redirect("peserta/rally2/envelope-redirect/$id");
+        }
+
+        abort(404);
+    });
+
+
+        //================MAIN RALLY 2=======================
+    Route::post('/rally2/buy', [R2Controller::class, 'buyMachine'])->name('rally2.buy');
+
+    // =================== RALLY 1===================
+    Route::get('/rally1', [R1Controller::class, 'index'])->name('rally-1.index');
+
+
 });
