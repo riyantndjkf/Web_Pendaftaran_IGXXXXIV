@@ -3,7 +3,9 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\R1AdminController;
 use App\Http\Controllers\R1Controller;
+use App\Http\Controllers\R1PesertaController;
 use App\Http\Controllers\R2Controller;
 use App\Http\Controllers\RallyGames;
 use App\Http\Controllers\SoalQRController;
@@ -68,9 +70,23 @@ Route::group([
     'as' => 'admin.'
 ], function () {
      Route::get('/rally1', [AdminController::class, 'rally1'])->name('rally-1.index');
+    //======================RALLY 1====================//
+    Route::get('/rally1/pos', [R1AdminController::class, 'overview'])->name('overview');
+    Route::get('/rally1/pos/{id}', [R1AdminController::class, 'index'])->name('pos');
+    Route::post('/rally1/pos/{id}/beri', [R1AdminController::class, 'beriKomponen'])->name('beri');
+    Route::post('/rally1/pos/{id}/status', [R1AdminController::class, 'updateStatus'])->name('status');
+    Route::post('/rally1/pos/{id}/menang/{tim}', [R1AdminController::class, 'beriMenang'])->name('menang');
+    Route::post('/rally1/pos/{id}/kalah/{tim}', [R1AdminController::class, 'beriKalah'])->name('kalah');
+    Route::post('/rally1/pos/{id}/gagal', [R1AdminController::class, 'beriGagal'])->name('gagal');
 
 
+    Route::post('/admin/pos/{id}/aksi', [R1AdminController::class, 'aksi'])->name('aksi');
 
+        Route::get('/admin', function () {
+        return view('admin.rally-1.home_admin');
+    })->name('admin.home');
+
+    //=============================RALLY 2 =============//
     Route::get('/rally2', action: [AdminController::class, 'rally2'])->name('rally-2.index');
     Route::post('/gantisesi', [AdminController::class, 'gantisesi'])->name('rally-2.gantisesigame');
 
@@ -127,6 +143,20 @@ Route::group([
 
     // =================== RALLY 1===================
     Route::get('/rally1', [R1Controller::class, 'index'])->name('rally-1.index');
+
+    Route::get('/rally1/komponen', [R1PesertaController::class, 'lihatKomponen'])->name('komponen');
+
+
+    Route::get('/rally1/pos/{id}', [R1PesertaController::class, 'showPos'])->name('pos.show');
+    Route::get('/rally1/peserta/pos', [R1PesertaController::class, 'daftarPos'])->name('pos');
+    Route::post('/rally1/peserta/pos/{id}/pergi', [R1PesertaController::class, 'pergiKePos'])->name('pos.pergi');
+
+    Route::get('/rally1/produksi', [R1PesertaController::class, 'showProduksi'])->name('produksi');
+    Route::post('/rally1/produksi/{jenis}', [R1PesertaController::class, 'produksiSepeda'])->name('produksi.sepeda');
+
+    Route::get('/rally1/jual', [R1PesertaController::class, 'showJual'])->name('jual');
+    Route::post('/rally1/jual', [R1PesertaController::class, 'jualSepeda'])->name('jual.sepeda');
+
 });
 
 

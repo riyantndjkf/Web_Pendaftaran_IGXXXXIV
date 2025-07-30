@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('poin_total_babak2')->default(0);
             $table->integer('harga_unlock')->default(100000);           
             $table->boolean("unlocked_babak2")->default(0); 
+            $table->integer('uang')->default(20); 
         });
     }
 

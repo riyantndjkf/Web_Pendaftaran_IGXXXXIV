@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Komponen;
+use App\Models\PoinBabak1;
+use App\Models\Sepeda;
 use App\Models\Team;
 use App\Models\Tteam;
 use Illuminate\Foundation\Auth\RegistersUsers;
@@ -62,6 +65,20 @@ class RegisterController extends Controller
                 'name' => $request->nama_tim,
                 'role' => 'peserta',
                 'password' => bcrypt($request->password),
+            ]);
+
+            
+            Komponen::create([
+                'team_id' => $team->id,
+            ]);
+
+            Sepeda::create([
+                'team_id' => $team->id,
+            ]);
+
+            PoinBabak1::create([
+                'sepeda_komponen_peserta_namaTim1' => $team->id,
+                'total_poin' => 0,
             ]);
 
 

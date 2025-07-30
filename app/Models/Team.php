@@ -50,4 +50,16 @@ class Team extends Authenticatable
     {
         return $this->hasMany(Member::class,"team_id");
     }
+     public function komponen()
+    {
+        return $this->hasOne(Komponen::class, 'team_id');
+    }
+    public function sepeda()
+    {
+        return $this->hasOne(Sepeda::class);
+    }
+    public function poinBabak1()
+    {
+        return $this->hasOne(PoinBabak1::class);
+    }
 }

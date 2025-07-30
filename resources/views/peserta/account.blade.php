@@ -55,12 +55,12 @@
                 <!-- Status Pembayaran -->
                 <div class="bg-gray-700 p-4 rounded-md shadow-inner">
                     <p class="text-gray-300 text-lg">Status Pembayaran:</p>
-                    {{-- Menyesuaikan warna teks berdasarkan status pembayaran --}}
+                    {{-- Menyesuaikan warna teks berdasarkan status pembayaran 
                      @if ($team->ver_bukti_bayar)
                         <p class="text-green-400 text-2xl font-bold">Sudah Bayar</p>
                     @else
                         <p class="text-red-400 text-2xl font-bold">Belum Bayar</p>
-                    @endif
+                    @endif--}}
                 </div>
             </div>
 
