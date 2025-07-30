@@ -24,8 +24,20 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('peserta.home');
-    }
+        $user = Auth::user();
+
+        switch ($user->role) {
+            case 'admin':
+                 return view('admin.home'); // contoh route admin
+            case 'penpos':
+                 return view('admin.home'); // contoh route penpos
+            case 'peserta':
+                return view('peserta.home'); // tetap di halaman peserta
+            default:
+                abort(403, 'Unauthorized role');
+        }
+           
+        }
 
     public function account()
     {

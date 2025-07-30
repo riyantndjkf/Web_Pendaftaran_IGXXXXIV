@@ -25,5 +25,12 @@ class AccSeeder extends Seeder
                 'password' => bcrypt(123),
             ]);
 
+        User::create([
+                'name' => "admin",
+                'role' => 'admin',
+                'password' => bcrypt("admin123"),
+            ]);
+
+
     }
 }

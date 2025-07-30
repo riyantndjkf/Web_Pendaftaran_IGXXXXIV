@@ -16,6 +16,7 @@ class SessionSeeder extends Seeder
 
         Session::create([
             'id' => 1,
+            "jenis_sesi" => 1,
             'durasi' => 35,
             'demand' => 30,
             'event' => null,
@@ -23,6 +24,7 @@ class SessionSeeder extends Seeder
 
         Session::create([
             'id' => 2,
+            "jenis_sesi" => 0,
             'durasi' => 35,
             'demand' => 50,
             'event' => 'reward_amount * 1.5',
@@ -30,6 +32,7 @@ class SessionSeeder extends Seeder
 
         Session::create([
             'id' => 3,
+            "jenis_sesi" => 0,
             'durasi' => 35,
             'demand' => 35,
             'event' => 'maintenance * 1.5',
@@ -37,6 +40,7 @@ class SessionSeeder extends Seeder
 
         Session::create([
             'id' => 4,
+            "jenis_sesi" => 0,
             'durasi' => 35,
             'demand' => 70,
             'event' => null,

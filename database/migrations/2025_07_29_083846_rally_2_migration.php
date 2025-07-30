@@ -24,7 +24,7 @@ return new class extends Migration
         // Create tsession table
         Schema::create('tsession', function (Blueprint $table) {
             $table->id();
-            $table->integer('jenis_sesi')->nullable();
+            $table->boolean('jenis_sesi')->nullable();
             $table->integer('durasi');
             $table->integer('demand');
             $table->enum('event', ['reward_amount * 1.5', 'maintenance * 1.5'])->nullable();

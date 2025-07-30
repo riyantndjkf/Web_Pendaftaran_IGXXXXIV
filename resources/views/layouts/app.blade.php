@@ -8,14 +8,19 @@
 </head>
 <body class="bg-[#14191A] text-white min-h-screen flex flex-col">
 
-    @include('layouts.navbar')
+    @if(auth()->check() && auth()->user()->role === 'admin')
+        <main>
+            @yield('content')
+        </main>
+    @else
+        @include('layouts.navbar')
 
-    <main >
-        @yield('content')
-    </main>
+        <main>
+            @yield('content')
+        </main>
 
-    @include('layouts.footer')
-
+        @include('layouts.footer')
+    @endif
 </body>
 
 </html>

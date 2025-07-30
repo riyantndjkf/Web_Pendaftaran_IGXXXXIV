@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\GameController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\R1Controller;
@@ -60,9 +61,24 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', fn () => view('admin.dashboard'))->name('admin.dashboard');
 });
 
+//=====================ADMIN====================//
+Route::group([
+    'middleware' => ['auth', 'role:admin'],
+    'prefix' => 'admin',
+    'as' => 'admin.'
+], function () {
+     Route::get('/rally1', [AdminController::class, 'rally1'])->name('rally-1.index');
 
+
+
+    Route::get('/rally2', action: [AdminController::class, 'rally2'])->name('rally-2.index');
+    Route::post('/gantisesi', [AdminController::class, 'gantisesi'])->name('rally-2.gantisesigame');
+
+});
+
+
+//==================PESERTA====================//
 Route::get('/home', [HomeController::class, 'index'])->name('home');
-
 Route::group([
     'middleware' => ['auth', 'role:peserta', 'cek.routing.peserta'],
     'prefix' => 'peserta',

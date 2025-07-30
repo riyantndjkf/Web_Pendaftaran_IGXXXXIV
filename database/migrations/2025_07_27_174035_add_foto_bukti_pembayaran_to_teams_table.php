@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('foto_bukti_pembayaran')->nullable()->after('asal_sekolah');
             $table->boolean('ver_bukti_bayar')->default(false);
             $table->integer('total_uang_babak2')->default(100000);
-            $table->integer('poin_total_babak2')->nullable();
+            $table->integer('poin_total_babak2')->default(0);
             $table->integer('current_session_babak2')->default(1);           
             $table->boolean("unlocked_babak2")->default(0); 
         });
