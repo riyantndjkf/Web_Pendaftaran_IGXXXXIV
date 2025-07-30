@@ -13,14 +13,22 @@
         </button>
     </div>
 
-    <div class="p-4">
-        <div class="bg-white rounded-lg mb-4 text-black p-5">
-            <h1 class="font-bold text-[50px]">SESI 1</h1>
-            <div class="flex flex-col gap-2">
-                <h3 class="font-bold text-xl">Diskon inventory cost (25%)</h3>
-                <h3 class="font-bold text-xl">Reward jawab soal x1.5</h3>
-            </div>
-        </div>
+    <div class="max-w-2xl  mt-10 bg-gradient-to-r from-yellow-100 to-pink-100 shadow-lg rounded-lg p-6 mx-4">
+        <h2 class="text-2xl font-bold text-pink-700 mb-4 flex items-center gap-2">
+            <svg class="w-6 h-6 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Event Sesi Aktif
+        </h2>
+
+        @if ($event)
+            <p class="text-lg text-gray-800">
+                <strong class="text-pink-600">Event:</strong> {{ $event }}
+            </p>
+        @else
+            <p class="text-gray-600">Tidak ada event aktif saat ini.</p>
+        @endif
     </div>
 
     <x-rally-2-sidebar />

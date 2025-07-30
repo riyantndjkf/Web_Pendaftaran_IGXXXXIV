@@ -20,13 +20,17 @@ class R2Controller extends Controller
         $user = Auth::user();
         $team = Team::where('nama_tim', $user->name)->firstOrFail();
 
+        // Ambil sesi aktif
+        $activeSession = DB::table('tsession')->where('jenis_sesi', 1)->first();
+        $currentDemand = $activeSession ? $activeSession->demand : 0;
+
         // Ambil semua mesin
         $allMachines = Machine::all();
 
         // Ambil mesin yang dimiliki tim
         $ownedMachines = TeamMachine::where('team_id', $team->id)->get()->keyBy('tmachine_id');
 
-       
+        
 
         $factories = $allMachines->map(function ($machine) use ($ownedMachines) {
             $owned = $ownedMachines->has($machine->id);
@@ -85,10 +89,7 @@ class R2Controller extends Controller
         $gameData = [
             'timer' => '00:00',
             'elapsed_seconds' => session('rally2_timer', 0),
-            'demand' => [
-                'current' => 35,
-                'fulfilled' => 0
-            ],
+            'demand' =>  $currentDemand  ,
             'capital' => $team->total_uang_babak2,
             'factories_locked' => !$team->unlocked_babak2,
             'unlock_cost' => 100000,
@@ -137,7 +138,13 @@ class R2Controller extends Controller
 
     public function events()
     {
-        return view('peserta.rally-2.events');
+            // Ambil sesi aktif
+        $activeSession = DB::table('tsession')->where('jenis_sesi', 1)->first();
+
+        // Ambil event jika ada
+        $event = $activeSession ? $activeSession->event : null;
+
+        return view('peserta.rally-2.events', compact('event'));
     }
 
     public function inventory()
