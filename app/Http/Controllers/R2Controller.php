@@ -29,21 +29,45 @@ class R2Controller extends Controller
             $owned = $ownedMachines->has($machine->id);
             $ownedData = $ownedMachines->get($machine->id);
 
+            $kapasitasDasar = $owned ? ($ownedData->kapasitas_dasar ?? $machine->kapasitas_dasar) : $machine->kapasitas_dasar;
+            $baseTime = $owned ? ($ownedData->base_time ?? $machine->base_time) : $machine->base_time;
+            $upgradePrices = [
+                2 => $machine->harga_dasar + 1000,
+                3 => $machine->harga_dasar + 2000,
+            ];
+
+            $capacityPerLevel = [
+                1 => $machine->kapasitas_dasar,
+                2 => $machine->kapasitas_dasar + 1,
+                3 => $machine->kapasitas_dasar + 2,
+            ];
+
+            $timePerLevel = [
+                1 => $machine->base_time,
+                2 => max(1, $machine->base_time - 1),
+                3 => max(1, $machine->base_time - 2),
+            ];
+
+           
             return [
                 'machine_id' => $machine->id,
                 'name' => $machine->name,
                 'jenis' => $machine->jenis,
                 'harga_dasar' => $machine->harga_dasar,
-                'kapasitas_dasar' => $machine->kapasitas_dasar,
-                'base_time' => $machine->base_time,
+                'kapasitas_dasar' => $kapasitasDasar,
+                'base_time' => $baseTime,
                 'biaya_maintenance' => $machine->biaya_maintenance,
                 'owned' => $owned,
+                'owned_id' => $owned ? $ownedData->id : null,
                 'level' => $owned ? $ownedData->level : null,
-                'is_active' => $owned ? $ownedData->is_active : null,
+                
                 'operator_hired' => $owned ? $ownedData->operator_hired : null,
+
+                'upgrade_prices' => $upgradePrices,
+                'capacity_per_level' => $capacityPerLevel,
+                'time_per_level' => $timePerLevel,
             ];
         });
-
         $gameData = [
             'timer' => '00:00',
             'elapsed_seconds' => session('rally2_timer', 0),
@@ -55,7 +79,8 @@ class R2Controller extends Controller
             'factories_locked' => !$team->unlocked_babak2,
             'unlock_cost' => 100000,
             "machine"=> $allMachines,
-            'factories' => $factories
+            'factories' => $factories,
+            "owned"=>$ownedMachines,
         ];
 
         return view('peserta.rally-2.index', compact('gameData'));
@@ -221,8 +246,9 @@ class R2Controller extends Controller
                 'team_id' => $team->id,
                 'tmachine_id' => $machineId,
                 'level' => 1,
-                'is_active' => false,
                 'operator_hired' => false,
+                "base_time"=>$machine->base_time,
+                "kapasitas_dasar"=>$machine->kapasitas_dasar,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ]);
@@ -237,5 +263,60 @@ class R2Controller extends Controller
             'machine_id' => $machineId,
         ]);
     }
+    public function upgradeMachine(Request $request)
+    {
+        $user = Auth::user();
+        $team = Team::where('nama_tim', $user->name)->firstOrFail();
+
+        $ownedId = $request->input('owned');
+        $nextLevel = $request->input('next_level');
+        $price = $request->input('price');
+        $newCapacity = $request->input('new_capacity');
+        $newTime = $request->input('new_time');
+
+        $teamMachine = TeamMachine::where('id', $ownedId)
+            ->where('team_id', $team->id)
+            ->first();
+
+        if (!$teamMachine) {
+            return response()->json(['error' => 'Mesin belum dimiliki.'], 400);
+        }
+
+        if ($teamMachine->level >= 3) {
+            return response()->json(['error' => 'Mesin sudah pada level maksimum.'], 400);
+        }
+        Log::error($teamMachine->level);
+        if ($teamMachine->level + 1 !== $nextLevel) {
+            return response()->json(['error' => 'Level upgrade tidak valid.'], 400);
+        }
+
+        if ($team->total_uang_babak2 < $price) {
+            return response()->json(['error' => 'Uang tidak mencukupi untuk upgrade mesin ini.'], 400);
+        }
+
+        // Potong uang
+        $team->total_uang_babak2 -= $price;
+        $team->save();
+
+        // Update level
+        $teamMachine->level = $nextLevel;
+
+        // (Opsional) simpan kapasitas dan waktu baru jika ada kolomnya
+        $teamMachine->kapasitas_dasar = $newCapacity ?? $teamMachine->kapasitas;
+        $teamMachine->base_time = $newTime ?? $teamMachine->waktu;
+
+        $teamMachine->save();
+
+        return response()->json([
+            'message' => 'Mesin berhasil diupgrade ke level ' . $nextLevel,
+            'capital' => $team->total_uang_babak2,
+            'level' => $nextLevel,
+            'kapasitas_dasar' => $newCapacity,
+            'base_time' => $newTime,
+        ]);
+    }
+
+
+
 
 }

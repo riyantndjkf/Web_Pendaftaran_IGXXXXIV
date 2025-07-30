@@ -6,43 +6,39 @@
     </svg>
 
     <div class="grid grid-cols-4 gap-2" id="factoryGrid">
-        @foreach($factories as $index => $factory)
-            <div class="p-3 aspect-square flex flex-col items-center justify-center relative factory-item {{ $factory['owned'] ? '' : 'locked-initial' }}"
-                data-unlocked="{{ $factory['owned'] ? 'true' : 'false' }}" data-index="{{ $index }}"
-                onclick="showFactoryInfo({{ $index }}, {{ json_encode($factory) }})">
+    @foreach($factories as $index => $factory)
+    
+        <div class="p-3 aspect-square flex flex-col items-center justify-center relative factory-item {{ $factory['owned'] ? '' : 'locked-initial' }}"
+            data-unlocked="{{ $factory['owned'] ? 'true' : 'false' }}" data-index="{{ $index }}"
+            onclick="showFactoryInfo({{ $index }}, {{ json_encode($factory) }})">
 
-               <div
-    class="aspect-square w-full relative border-2 transition cursor-pointer rounded-[20px]
-        {{ $factory['owned'] ? 'bg-green-100 border-green-400 hover:border-green-600' : 'bg-white border-red-300 hover:border-red-400' }}">
+            <div class="aspect-square w-full relative border-2 transition cursor-pointer rounded-[20px]
+                {{ $factory['owned'] ? 'bg-green-100 border-green-400 hover:border-green-600' : 'bg-white border-red-300 hover:border-red-400' }}">
 
-    @if($factory['owned'])
-        <img
-            src="{{ asset('storage/rally-2/mesin' . $factory['machine_id'] . '.png') }}"
-            alt="{{ $factory['name'] }}"
-            class="w-full h-full object-cover rounded-[20px]" />
+                @if($factory['owned'])
+                    <img
+                        src="{{ asset('storage/rally-2/mesin' . $factory['jenis'] . '.png') }}"
+                        alt="{{ $factory['name'] }}"
+                        class="w-full h-full object-cover rounded-[20px]" />
 
-        <div
-            class="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-            {{ $factory['level'] }}
-        </div>
-    @else
-        <div class="w-full h-full flex items-center justify-center rounded-[20px]">
-            <x-fas-plus class="w-10 h-10 text-red-500" />
-        </div>
-    @endif
-</div>
-
-
-
-
-                <img src="{{ asset('icons/icon_pekerja.svg') }}" alt="icon pekerja"
-                    onclick="event.stopPropagation(); showWorkerModal({{ $index }}, {{ json_encode($factory) }})"
-                    class="cursor-pointer hover:scale-110 transition-transform {{ $factory['owned'] ? '' : 'opacity-30 pointer-events-none' }}">
+                    <div
+                        class="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        {{ $factory['level'] }}
+                    </div>
+                @else
+                    <div class="w-full h-full flex items-center justify-center rounded-[20px]">
+                        <x-fas-plus class="w-10 h-10 text-red-500" />
+                    </div>
+                @endif
             </div>
-        @endforeach
 
-    </div>
+            <img src="{{ asset('icons/icon_pekerja.svg') }}" alt="icon pekerja"
+                onclick="event.stopPropagation(); showWorkerModal({{ $index }}, {{ json_encode($factory) }})"
+                class="cursor-pointer hover:scale-110 transition-transform {{ $factory['owned'] ? '' : 'opacity-30 pointer-events-none' }}">
+        </div>
+    @endforeach
 </div>
+
 
 <!-- Factory Info Modal -->
 <div id="factoryInfoModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
@@ -228,7 +224,7 @@
    function showFactoryInfo(index, factory) {
         selectedFactoryIndex = index;
         selectedFactory = factory;
-
+        
         document.getElementById('machineTitle').textContent = `Machine ${factory.name} Info`;
         document.getElementById('machineLevel').textContent = `Level ${factory.level || 1}`;
         document.getElementById('machineCapacity').textContent = `Kapasitas: ${factory.kapasitas_dasar || 5}`;
@@ -254,8 +250,8 @@
 
     function hideFactoryInfo() {
         hideModal('factoryInfoModal', () => {
-            selectedFactoryIndex = null;
-            selectedFactory = null;
+          //  selectedFactoryIndex = null;
+          //  selectedFactory = null;
         });
     }
 
@@ -313,30 +309,90 @@
 
 
     function showUpgradeModal() {
-        const currentLevel = selectedFactory.level || 1;
+        const currentLevel = parseInt(selectedFactory.level) ;
+        
         const nextLevel = currentLevel + 1;
-        const upgradePrice = (selectedFactory.price || 3000) + 1000;
-        const newCapacity = (selectedFactory.capacity || 5) + 1;
-        const newTime = Math.max((selectedFactory.production_time || 6) - 2, 1);
 
-        document.getElementById('upgradeFromTo').textContent = `level ${currentLevel} → level ${nextLevel}`;
-        document.getElementById('upgradeCapacity').textContent = `Kapasitas: ${newCapacity} unit`;
-        document.getElementById('upgradeTime').textContent = `waktu: ${newTime} menit`;
-        document.getElementById('upgradePrice').textContent = `$${upgradePrice}`;
+        if (nextLevel > 3) {
+            alert("Mesin sudah pada level maksimum.");
+            return;
+        }
+
+        const upgradePrices = selectedFactory.upgrade_prices || {};
+        const capacities = selectedFactory.capacity_per_level || {};
+        const times = selectedFactory.time_per_level || {};
+
+
+        document.getElementById('upgradeFromTo').textContent = `Level ${currentLevel} → Level ${nextLevel}`;
+        document.getElementById('upgradeCapacity').textContent = `Kapasitas: ${capacities[nextLevel]} unit`;
+        document.getElementById('upgradeTime').textContent = `Waktu: ${times[nextLevel]} menit`;
+        document.getElementById('upgradePrice').textContent = `$${upgradePrices[nextLevel]}`;
 
         hideFactoryInfo();
         showModal('upgradeModal');
     }
 
+
     function hideUpgradeModal() {
         hideModal('upgradeModal');
     }
 
-    function confirmUpgrade() {
-        alert('Mesin Berhasil Diupgrade!');
+     function confirmUpgrade() {
+        const owned = selectedFactory.owned_id;
+        const currentLevel = parseInt(selectedFactory.level);
+        const nextLevel = currentLevel + 1;
+
+        const upgradePrices = selectedFactory.upgrade_prices || {};
+        const capacities = selectedFactory.capacity_per_level || {};
+        const times = selectedFactory.time_per_level || {};
+
+        const price = upgradePrices[nextLevel];
+        const newCapacity = capacities[nextLevel];
+        const newTime = times[nextLevel];
+
+        console.log("selectedFactory:", {
+            owned,
+            nextLevel,
+            price,
+            newCapacity,
+            newTime
+        });
+        fetch("{{ route('peserta.rally2.upgrade') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": window.Laravel.csrfToken
+            },
+            body: JSON.stringify({
+                owned: owned,
+                next_level: nextLevel,
+                price: price,
+                new_capacity: newCapacity,
+                new_time: newTime
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                alert(data.message || "Berhasil diupgrade!");
+                window.capital = data.capital;
+                location.reload();
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Gagal upgrade mesin.");
+        });
+
         hideUpgradeModal();
     }
 
+
+
+
+    
     function showSellModal() {
         const sellPrice = Math.floor((selectedFactory.price || 3000) * 0.7);
         document.getElementById('sellPrice').textContent = `+$${sellPrice}`;

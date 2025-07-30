@@ -62,7 +62,8 @@ return new class extends Migration
             $table->foreignId('team_id')->constrained('teams')->onDelete('restrict')->onUpdate('restrict');
             $table->foreignId('tmachine_id')->constrained('tmachine')->onDelete('restrict')->onUpdate('restrict');
             $table->enum('level', ['1', '2', '3']);
-            $table->boolean('is_active');
+            $table->integer('kapasitas_dasar')->default(0);
+            $table->integer('base_time');
             $table->boolean('operator_hired')->default(0);
             $table->timestamps();
         });
