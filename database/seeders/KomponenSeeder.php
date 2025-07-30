@@ -14,11 +14,7 @@ class KomponenSeeder extends Seeder
     public function run()
     {
         DB::table('komponen')->insert([
-            'peserta_namaTim' => 'TimDemo',
-            'wheel_26' => 2,
-            'brake' => 1,
-            'pedal' => 3,
-            'basket' => 1
+            'peserta_namaTim' => 'TimDemo'
         ]);
     }
 }

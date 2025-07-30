@@ -3,9 +3,9 @@
 <head>
     <title>IGBike Home</title>
     <style>
-        .kosong { background-color: #c8e6c9; }       /* Hijau */
-        .butuh_grup { background-color: #fff9c4; }   /* Kuning */
-        .terisi { background-color: #ffcdd2; }       /* Merah */
+        .kosong { background-color: #c8e6c9; }       
+        .butuh_grup { background-color: #fff9c4; }  
+        .terisi { background-color: #ffcdd2; }       
         td, th { padding: 8px 12px; }
         form { margin: 0; }
         button[disabled] { opacity: 0.6; cursor: not-allowed; }
@@ -21,7 +21,6 @@
         $uang = DB::table('peserta')->where('namaTim', $tim)->value('uang') ?? 0;
         $posList = DB::table('pos')->get();
 
-        // Ambil 3 kunjungan terakhir tim ini
         $riwayat = DB::table('riwayat_pos')
             ->where('peserta_namaTim', $tim)
             ->orderByDesc('waktu')
@@ -37,6 +36,7 @@
     <ul>
         <li><a href="/produksi">Rakit Sepeda</a></li>
         <li><a href="/jual">Jual Sepeda</a></li>
+        <li><a href="{{ route('peserta.komponen') }}">Inventory</a></li>
     </ul>
 
     <hr>

@@ -13,9 +13,7 @@ return new class extends Migration
     {
         Schema::create('komponen', function (Blueprint $table) {
             $table->string('peserta_namaTim')->unique();
-            $table->integer('wheel_26')->default(0);
-            $table->integer('wheel_16')->default(0);
-            $table->integer('wheel_27')->default(0);
+            $table->integer('wheel')->default(0);
             $table->integer('brake')->default(0);
             $table->integer('pedal')->default(0);
             $table->integer('chain_and_gear')->default(0);
@@ -23,9 +21,6 @@ return new class extends Migration
             $table->integer('folding_frame')->default(0);
             $table->integer('mountain_frame')->default(0);
             $table->integer('unicycle_frame')->default(0);
-            $table->integer('basket')->default(0);
-            $table->integer('hinge')->default(0);
-            $table->integer('mountain_suspension')->default(0);
             $table->foreign('peserta_namaTim')->references('namaTim')->on('peserta');
         });
     }

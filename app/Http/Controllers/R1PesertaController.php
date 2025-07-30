@@ -141,6 +141,22 @@ class R1PesertaController extends Controller
         return view('peserta_pos', compact('posList', 'riwayat', 'tim'));
     }
 
+    public function lihatKomponen()
+    {
+        $tim = session('namaTim');
+
+        $komponen = DB::table('komponen')
+            ->where('peserta_namaTim', $tim)
+            ->first();
+
+        return view('peserta_komponen', [
+            'tim' => $tim,
+            'komponen' => $komponen
+        ]);
+    }
+
+
+
     public function pergiKePos($id)
     {
         $tim = $this->getTim();
