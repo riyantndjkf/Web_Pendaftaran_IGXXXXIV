@@ -2424,7 +2424,7 @@ class SoalQrSeeder extends Seeder
                 'option_3' => '15 m',
                 'option_4' => '25 m',
                 'jawaban_benar' => '5 m',
-                'gambar_soal' => null
+                'gambar_soal' => 'Fisika_Mudah_4.png'
             ],
             [
                 'id' => 202,
@@ -2436,7 +2436,7 @@ class SoalQrSeeder extends Seeder
                 'option_3' => '\( 150\ \text{N} \)',
                 'option_4' => '\( 330\ \text{N} \)',
                 'jawaban_benar' => '330 n',
-                'gambar_soal' => null
+                'gambar_soal' => 'Fisika_Sedang_5.png'
             ],
             [
                 'id' => 203,
@@ -2448,7 +2448,7 @@ class SoalQrSeeder extends Seeder
                 'option_3' => '\( 3\ \text{V} \)',
                 'option_4' => '\( 4\ \text{V} \)',
                 'jawaban_benar' => '3 v',
-                'gambar_soal' => null
+                'gambar_soal' => 'Fisika_Sedang_12.png'
             ],
             [
                 'id' => 204,
@@ -2460,7 +2460,7 @@ class SoalQrSeeder extends Seeder
                 'option_3' => '\( 6\ \text{cm} \) di kanan \( P \)',
                 'option_4' => '\( 6\ \text{cm} \) di kiri \( Q \)',
                 'jawaban_benar' => '6 cm di kiri q',
-                'gambar_soal' => null
+                'gambar_soal' => 'Fisika_Sedang_13.png'
             ],
             [
                 'id' => 205,
@@ -2472,7 +2472,7 @@ class SoalQrSeeder extends Seeder
                 'option_3' => '\( (30, 20) \)',
                 'option_4' => '\( (30, 40) \)',
                 'jawaban_benar' => '(20,30)',
-                'gambar_soal' => null
+                'gambar_soal' => 'Fisika_Sulit_2.png'
             ],
             [
                 'id' => 206,
@@ -2484,7 +2484,7 @@ class SoalQrSeeder extends Seeder
                 'option_3' => '\( 6\ \text{m/s}^2 \)',
                 'option_4' => '\( 10\ \text{m/s}^2 \)',
                 'jawaban_benar' => '3 m/s2',
-                'gambar_soal' => null
+                'gambar_soal' => 'Fisika_Sulit_4.png'
             ],
             [
                 'id' => 207,
@@ -2496,18 +2496,6 @@ class SoalQrSeeder extends Seeder
                 'option_3' => '\( 95\ \text{m} \)',
                 'option_4' => '\( 125\ \text{m} \)',
                 'jawaban_benar' => '75 m',
-                'gambar_soal' => null
-            ],
-            [
-                'id' => 208,
-                'level' => '3',
-                'pertanyaan' => 'Seorang mahasiswa diberi tugas untuk mengukur kekuatan sebuah lampu. Data tersebut dikumpulkan dan diolah menggunakan software, hasil outputnya pada tabel dibawah ini. Berapakah jam rata-rata waktu yang dibutuhkan sampai lampu tersebut rusak?',
-                'reward_amount'=> 3000,
-                'option_1' => '120,150 jam',
-                'option_2' => '186,063 jam',
-                'option_3' => '655,967 jam',
-                'option_4' => '296,257 jam',
-                'jawaban_benar' => '296,257 jam',
                 'gambar_soal' => null
             ],
         ]);
