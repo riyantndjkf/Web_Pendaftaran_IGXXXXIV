@@ -130,7 +130,7 @@ Route::group([
 });
 
 
-    Route::get('/rally2/{id}', function ($id) {
+Route::get('peserta/rally2/{id}', function ($id) {
         if (is_numeric($id)) {
             return redirect("peserta/rally2/qr-redirect/$id");
         }
@@ -141,7 +141,7 @@ Route::group([
     
 
 
- Route::get('/mystery-envelope/{id}', function ($id) {
+Route::get('/mystery-envelope/{id}', function ($id) {
         if (is_numeric($id)) {
             return redirect("peserta/rally2/envelope-redirect/$id");
         }
