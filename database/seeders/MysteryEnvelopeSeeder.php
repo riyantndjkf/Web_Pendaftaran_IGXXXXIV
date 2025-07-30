@@ -18,7 +18,7 @@ class MysteryEnvelopeSeeder extends Seeder
                 'id' => 1,
                 'reward_amount' => 3000,
                 'deskripsi_lokasi' => 'Gazebo Teknik',
-                'tTeam_id' => null
+                'team_id' => null
             ],
         ]);
     }

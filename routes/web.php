@@ -78,11 +78,13 @@ Route::group([
     Route::get('/rally2', [R2Controller::class, 'index'])->name('rally-2.index');
     Route::post('/rally2/unlock', [R2Controller::class, 'unlockFactory'])->name('rally2.unlock');
     
-
+            //==================SIDEBAR======================
     Route::get('/rally2/scanner', [R2Controller::class, 'scanner'])->name('rally-2.scanner');
     Route::get('/rally2/events', [R2Controller::class, 'events'])->name('rally-2.events');
     Route::get('/rally2/inventory', [R2Controller::class, 'inventory'])->name('rally-2.inventory');
 
+
+            //==================SCANNER==========================
     Route::get('/rally2/question/{id}', [R2Controller::class, 'showQR'])
         ->middleware('cek.soal.qr')->name('rally-2.question');
 
@@ -117,6 +119,10 @@ Route::group([
 
         abort(404);
     });
+
+
+        //================MAIN RALLY 2=======================
+    Route::post('/rally2/buy', [R2Controller::class, 'buyMachine'])->name('rally2.buy');
 
     // =================== RALLY 1===================
     Route::get('/rally1', [R1Controller::class, 'index'])->name('rally-1.index');

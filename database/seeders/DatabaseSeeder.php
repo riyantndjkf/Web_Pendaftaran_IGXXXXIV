@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
             MachineSeeder::class,
             SoalQrSeeder::class,
             MysteryEnvelopeSeeder::class,
+            AccSeeder::class,
     ]);
     }
 }

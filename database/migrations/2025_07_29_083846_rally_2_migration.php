@@ -63,7 +63,7 @@ return new class extends Migration
             $table->foreignId('tmachine_id')->constrained('tmachine')->onDelete('restrict')->onUpdate('restrict');
             $table->enum('level', ['1', '2', '3']);
             $table->boolean('is_active');
-            $table->boolean('operater_hired');
+            $table->boolean('operator_hired')->default(0);
             $table->timestamps();
         });
 

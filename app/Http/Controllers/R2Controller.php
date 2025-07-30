@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\Machine;
+use App\Models\TeamMachine;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use App\Models\SoalQR;
 use App\Models\MysteryEnvelope;
@@ -11,14 +14,38 @@ use Illuminate\Http\Request;
 
 class R2Controller extends Controller
 {
-public function index(Request $request)
+    public function index(Request $request)
     {
         $user = Auth::user();
         $team = Team::where('nama_tim', $user->name)->firstOrFail();
 
+        // Ambil semua mesin
+        $allMachines = Machine::all();
+
+        // Ambil mesin yang dimiliki tim
+        $ownedMachines = TeamMachine::where('team_id', $team->id)->get()->keyBy('tmachine_id');
+
+        $factories = $allMachines->map(function ($machine) use ($ownedMachines) {
+            $owned = $ownedMachines->has($machine->id);
+            $ownedData = $ownedMachines->get($machine->id);
+
+            return [
+                'machine_id' => $machine->id,
+                'name' => $machine->name,
+                'jenis' => $machine->jenis,
+                'harga_dasar' => $machine->harga_dasar,
+                'kapasitas_dasar' => $machine->kapasitas_dasar,
+                'base_time' => $machine->base_time,
+                'biaya_maintenance' => $machine->biaya_maintenance,
+                'owned' => $owned,
+                'level' => $owned ? $ownedData->level : null,
+                'is_active' => $owned ? $ownedData->is_active : null,
+                'operator_hired' => $owned ? $ownedData->operator_hired : null,
+            ];
+        });
+
         $gameData = [
             'timer' => '00:00',
-            // Get elapsed_seconds directly from the session
             'elapsed_seconds' => session('rally2_timer', 0),
             'demand' => [
                 'current' => 35,
@@ -27,23 +54,8 @@ public function index(Request $request)
             'capital' => $team->total_uang_babak2,
             'factories_locked' => !$team->unlocked_babak2,
             'unlock_cost' => 100000,
-            'factories' => [
-                ['unlocked' => true, 'active' => true, 'owned' => true, 'workers' => 5],
-                ['unlocked' => true, 'active' => true, 'owned' => true, 'workers' => 3],
-                ['unlocked' => true, 'active' => true, 'owned' => true, 'workers' => 4],
-                ['unlocked' => true, 'active' => true, 'owned' => true, 'workers' => 2],
-                ['unlocked' => true, 'active' => true],
-                ['unlocked' => true, 'active' => true],
-                ['unlocked' => true, 'active' => true],
-                ['unlocked' => true, 'active' => true],
-                ['unlocked' => true, 'active' => true],
-                ['unlocked' => true, 'active' => true],
-                ['unlocked' => true, 'active' => true],
-                ['unlocked' => false, 'active' => false],
-                ['unlocked' => false, 'active' => false],
-                ['unlocked' => false, 'active' => false],
-                ['unlocked' => false, 'active' => false],
-            ]
+            "machine"=> $allMachines,
+            'factories' => $factories
         ];
 
         return view('peserta.rally-2.index', compact('gameData'));
@@ -175,4 +187,55 @@ public function index(Request $request)
         // Kirim tampilan reward
         return view('peserta.rally-2.claim-envelope', compact('envelope'));
     }
+
+
+
+    //============= MAIN RALLY 2 ====================//
+    public function buyMachine(Request $request)
+    {
+        $user = Auth::user();
+        $team = Team::where('nama_tim', $user->name)->firstOrFail();
+
+        $machineId = $request->input('machine_id');
+        $machine = Machine::findOrFail($machineId);
+
+        $alreadyOwned = TeamMachine::where('team_id', $team->id)
+        ->where('tmachine_id', $machineId)
+        ->exists();
+
+        if ($alreadyOwned) {
+            return response()->json(['error' => 'Mesin sudah dimiliki.'], 400);
+        }
+
+        if ($team->total_uang_babak2 < $machine->harga_dasar) {
+            return response()->json(['error' => 'Uang tidak mencukupi.'], 400);
+        }
+
+        // Kurangi uang tim
+        $team->total_uang_babak2 -= $machine->harga_dasar;
+        $team->save();
+
+        // Simpan ke t_team_machines
+        try {
+            TeamMachine::create([
+                'team_id' => $team->id,
+                'tmachine_id' => $machineId,
+                'level' => 1,
+                'is_active' => false,
+                'operator_hired' => false,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Gagal menyimpan TeamMachine: " . $e->getMessage());
+            return response()->json(['error' => 'Gagal menyimpan mesin.'], 500);
+        }
+
+        return response()->json([
+            'message' => 'Pembelian berhasil!',
+            'capital' => $team->total_uang_babak2,
+            'machine_id' => $machineId,
+        ]);
+    }
+
 }

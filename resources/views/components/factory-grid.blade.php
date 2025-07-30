@@ -7,27 +7,40 @@
 
     <div class="grid grid-cols-4 gap-2" id="factoryGrid">
         @foreach($factories as $index => $factory)
-            <div class="p-3 aspect-square flex flex-col items-center justify-center relative factory-item {{ $factory['unlocked'] ? '' : 'locked-initial' }}"
-                data-unlocked="{{ $factory['unlocked'] ? 'true' : 'false' }}" data-index="{{ $index }}"
+            <div class="p-3 aspect-square flex flex-col items-center justify-center relative factory-item {{ $factory['owned'] ? '' : 'locked-initial' }}"
+                data-unlocked="{{ $factory['owned'] ? 'true' : 'false' }}" data-index="{{ $index }}"
                 onclick="showFactoryInfo({{ $index }}, {{ json_encode($factory) }})">
 
-                <div
-                    class="bg-white rounded-lg p-3 aspect-square flex flex-col items-center justify-center relative border-2 border-gray-300 hover:border-blue-400 transition cursor-pointer">
-                    <x-fas-plus class="w-10 h-10 text-red-500" />
+               <div
+    class="aspect-square w-full relative border-2 transition cursor-pointer rounded-[20px]
+        {{ $factory['owned'] ? 'bg-green-100 border-green-400 hover:border-green-600' : 'bg-white border-red-300 hover:border-red-400' }}">
 
-                    @if($factory['unlocked'] && isset($factory['level']))
-                        <div
-                            class="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                            {{ $factory['level'] }}
-                        </div>
-                    @endif
-                </div>
+    @if($factory['owned'])
+        <img
+            src="{{ asset('storage/rally-2/mesin' . $factory['machine_id'] . '.png') }}"
+            alt="{{ $factory['name'] }}"
+            class="w-full h-full object-cover rounded-[20px]" />
+
+        <div
+            class="absolute -top-2 -right-2 bg-blue-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            {{ $factory['level'] }}
+        </div>
+    @else
+        <div class="w-full h-full flex items-center justify-center rounded-[20px]">
+            <x-fas-plus class="w-10 h-10 text-red-500" />
+        </div>
+    @endif
+</div>
+
+
+
 
                 <img src="{{ asset('icons/icon_pekerja.svg') }}" alt="icon pekerja"
                     onclick="event.stopPropagation(); showWorkerModal({{ $index }}, {{ json_encode($factory) }})"
-                    class="cursor-pointer hover:scale-110 transition-transform">
+                    class="cursor-pointer hover:scale-110 transition-transform {{ $factory['owned'] ? '' : 'opacity-30 pointer-events-none' }}">
             </div>
         @endforeach
+
     </div>
 </div>
 
@@ -199,8 +212,11 @@
         </div>
     </div>
 </div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 
 <script>
+    
     let selectedFactoryIndex = null;
     let selectedFactory = null;
     let connections = [];
@@ -209,37 +225,29 @@
     let selectedWorkerFactoryIndex = null;
     let selectedWorkerFactory = null;
 
-    function showFactoryInfo(index, factory) {
+   function showFactoryInfo(index, factory) {
         selectedFactoryIndex = index;
         selectedFactory = factory;
 
-        document.getElementById('machineTitle').textContent = `machine ${String.fromCharCode(65 + index)} info :`;
-        document.getElementById('machineLevel').textContent = `level ${factory.level || 1}`;
-        document.getElementById('machineCapacity').textContent = `Kapasitas: ${factory.capacity || 5}`;
-        document.getElementById('machineTime').textContent = `waktu : ${factory.production_time || 6} menit`;
-        document.getElementById('machinePrice').textContent = `$${factory.price || 3000}`;
+        document.getElementById('machineTitle').textContent = `Machine ${factory.name} Info`;
+        document.getElementById('machineLevel').textContent = `Level ${factory.level || 1}`;
+        document.getElementById('machineCapacity').textContent = `Kapasitas: ${factory.kapasitas_dasar || 5}`;
+        document.getElementById('machineTime').textContent = `Waktu: ${factory.base_time || 6} menit`;
+        document.getElementById('machinePrice').textContent = `$${factory.harga_dasar || 3000}`;
 
         const buyButton = document.getElementById('buyButton');
         const ownedButtons = document.getElementById('ownedButtons');
 
-        if (factory.unlocked) {
-            if (factory.owned) {
-                buyButton.classList.add('hidden');
-                ownedButtons.classList.remove('hidden');
-            } else {
-                buyButton.classList.remove('hidden');
-                ownedButtons.classList.add('hidden');
-                buyButton.textContent = 'BUY';
-                buyButton.className = 'w-full bg-green-500 text-white py-3 rounded-lg font-bold hover:bg-green-600 transition';
-                buyButton.disabled = false;
-            }
+        const isOwned = factory.owned === true || factory.owned === "true";
+
+        if (isOwned) {
+        buyButton.classList.add('hidden');
+        ownedButtons.classList.remove('hidden');
         } else {
-            buyButton.classList.remove('hidden');
-            ownedButtons.classList.add('hidden');
-            buyButton.textContent = 'LOCKED';
-            buyButton.className = 'w-full bg-gray-400 text-white py-3 rounded-lg font-bold cursor-not-allowed';
-            buyButton.disabled = true;
+        buyButton.classList.remove('hidden');
+        ownedButtons.classList.add('hidden');
         }
+
 
         showModal('factoryInfoModal');
     }
@@ -252,10 +260,10 @@
     }
 
     function buyMachine() {
-        if (!selectedFactory || !selectedFactory.unlocked) {
-            return;
-        }
+        console.log("selectedFactory:", selectedFactory); // 👈 cek apakah datanya ada
+        if (!selectedFactory || selectedFactory.owned) return;
 
+        // lanjutkan ke confirm modal
         document.getElementById('confirmPrice').textContent = `$${selectedFactory.price || 3000}`;
         showModal('buyConfirmModal');
     }
@@ -264,11 +272,45 @@
         hideModal('buyConfirmModal');
     }
 
-    function confirmBuy() {
-        alert('Mesin Berhasil Dibeli!');
-        hideBuyConfirm();
-        hideFactoryInfo();
+   function confirmBuy() {
+    console.log("BELII")
+        const price = selectedFactory.harga_dasar || 3000;
+        const machineId = selectedFactory.machine_id;
+
+        if (window.capital < price) {
+            alert("Uang tidak mencukupi untuk membeli mesin ini.");
+            hideBuyConfirm();
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('peserta.rally2.buy') }}",
+            type: "POST",
+            data: {
+                machine_id: machineId,
+                _token: window.Laravel.csrfToken
+            },
+            success: function(data) {
+                if (data.error) {
+                    alert("Gagal: " + data.error);
+                    return;
+                }
+
+                window.capital = data.capital;
+                updateCapitalDisplay();
+
+                alert(data.message);
+                hideBuyConfirm();
+                hideFactoryInfo();
+                location.reload();
+            },
+            error: function(xhr, status, error) {
+                console.error(error);
+                alert("Terjadi kesalahan saat membeli.");
+            }
+        });
     }
+
 
     function showUpgradeModal() {
         const currentLevel = selectedFactory.level || 1;
@@ -571,4 +613,11 @@
             }
         }
     });
+
+    function updateCapitalDisplay() {
+        const el = document.querySelector('div.text-right > .text-green-800');
+        if (el) {
+            el.textContent = '$' + window.capital.toLocaleString();
+        }
+    }
 </script>

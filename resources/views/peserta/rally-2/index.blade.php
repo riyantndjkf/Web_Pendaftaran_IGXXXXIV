@@ -72,7 +72,7 @@
                 <div class="flex space-x-3">
                     <button onclick="hideUnlockModal()"
                         class="flex-1 bg-gray-400 text-white py-2 rounded font-bold">CANCEL</button>
-                    <button onclick="unlockFactory()"
+                    <button onclick="unlockFactory(this)"
                         class="flex-1 bg-green-500 text-white py-2 rounded font-bold">UNLOCK</button>
                 </div>
             </div>
@@ -83,6 +83,7 @@
 
 @push('scripts')
 <script>
+     window.capital = {{ $gameData['capital'] }};
     window.Laravel = {
         csrfToken: document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     };
@@ -119,7 +120,11 @@
         document.getElementById('unlockModal').classList.add('hidden');
     }
 
-    function unlockFactory() {
+    function unlockFactory(button) {
+        button.disabled = true;
+        button.classList.add('bg-gray-400', 'cursor-not-allowed');
+        button.classList.remove('bg-green-500');
+
     fetch("{{ route('peserta.rally2.unlock') }}", {
         method: "POST",
         headers: {
