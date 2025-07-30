@@ -88,6 +88,11 @@ class R1AdminController extends Controller
             [$komponen => DB::raw("$komponen + $jumlah")]
         );
 
+        $tipePos = DB::table('pos')->where('id', $id)->value('tipe');
+        if ($tipePos === 'single' || $tipePos === 'battle') {
+            DB::table('pos')->where('id', $id)->update(['status' => 'kosong']);
+        }
+
         return back()->with('success', "Berhasil memberikan $jumlah $komponen ke tim $tim");
     }
 }
