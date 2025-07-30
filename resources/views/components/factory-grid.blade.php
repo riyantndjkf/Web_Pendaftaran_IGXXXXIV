@@ -481,7 +481,7 @@
         hideModal('connectModal');
     }
 
- function populateFactoryList() {
+    function populateFactoryList() {
     const factoryList = document.getElementById('factoryList');
     factoryList.innerHTML = '';
 
@@ -523,6 +523,12 @@
         );
     }
 
+    function isAlreadyUsedAsTo(ownedId) {
+        return factoriesData.some(f =>
+            (f.connections || []).some(c => c.to === ownedId)
+        );
+    }
+
     // Cari kandidat factory yang bisa dikoneksikan
     let candidateCount = 0;
 
@@ -530,8 +536,7 @@
         const isValidConnection =
             factory.owned &&
             index !== selectedFactoryIndex &&
-            parseInt(factory.jenis) === nextJenis &&
-            !isAlreadyUsedAsFrom(factory.owned_id);
+            parseInt(factory.jenis) === nextJenis; 
 
         if (isValidConnection) {
             candidateCount++;
@@ -564,37 +569,42 @@
     console.log("factoriesData:", factoriesData);
 }
 
+
+
+
+
+
     function connectFactories(fromIndex, toIndex) {
-    const fromFactory = factoriesData[fromIndex];
-    const toFactory = factoriesData[toIndex];
+        const fromFactory = factoriesData[fromIndex];
+        const toFactory = factoriesData[toIndex];
 
-    const payload = {
-        source_team_machine_id: fromFactory.owned_id,
-        target_team_machine_id: toFactory.owned_id,
-    };
+        const payload = {
+            source_team_machine_id: fromFactory.owned_id,
+            target_team_machine_id: toFactory.owned_id,
+        };
 
-    console.log("🔧 Payload to send:", payload);
+        console.log("🔧 Payload to send:", payload);
 
-    $.ajax({
-        url: "{{ route('peserta.rally2.connect') }}",
-        method: 'POST',
-        data: JSON.stringify(payload),
-        contentType: 'application/json',
-        headers: {
-              "X-CSRF-TOKEN": window.Laravel.csrfToken
-        },
-        success: function(response) {
-            alert("✅ Koneksi berhasil disimpan!");
-            hideConnectModal();
-            location.reload(); // atau update tampilan saja
-        },
-        error: function(xhr, status, error) {
-            console.error("❌ AJAX Error:", error);
-            console.log("📄 Response text:", xhr.responseText);
-            alert("❌ Gagal menghubungkan factory: " + (xhr.responseJSON?.message || "Unknown error"));
-        }
-    });
-}
+        $.ajax({
+            url: "{{ route('peserta.rally2.connect') }}",
+            method: 'POST',
+            data: JSON.stringify(payload),
+            contentType: 'application/json',
+            headers: {
+                "X-CSRF-TOKEN": window.Laravel.csrfToken
+            },
+            success: function(response) {
+                alert("✅ Koneksi berhasil disimpan!");
+                hideConnectModal();
+                location.reload(); // atau update tampilan saja
+            },
+            error: function(xhr, status, error) {
+                console.error("❌ AJAX Error:", error);
+                console.log("📄 Response text:", xhr.responseText);
+                alert("❌ Gagal menghubungkan factory: " + (xhr.responseJSON?.message || "Unknown error"));
+            }
+        });
+    }
 
 
 

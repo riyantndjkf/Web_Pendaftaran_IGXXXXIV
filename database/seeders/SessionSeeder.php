@@ -19,7 +19,7 @@ class SessionSeeder extends Seeder
             "jenis_sesi" => 1,
             'durasi' => 35,
             'demand' => 30,
-            'event' => null,
+            'event' => "",
         ]);
 
         Session::create([
@@ -27,7 +27,7 @@ class SessionSeeder extends Seeder
             "jenis_sesi" => 0,
             'durasi' => 35,
             'demand' => 50,
-            'event' => 'Total Hadih Point X 1,5',
+            'event' => "Total Hadih Point X 1.5",
         ]);
 
         Session::create([
@@ -35,7 +35,7 @@ class SessionSeeder extends Seeder
             "jenis_sesi" => 0,
             'durasi' => 35,
             'demand' => 35,
-            'event' => 'Harga Maintenance X 1,5',
+            'event' => "Harga Maintenance X 1.5",
         ]);
 
         Session::create([
@@ -43,7 +43,7 @@ class SessionSeeder extends Seeder
             "jenis_sesi" => 0,
             'durasi' => 35,
             'demand' => 70,
-            'event' => null,
+            'event' => "",
         ]);
     }
 }

@@ -22,6 +22,7 @@ class Team extends Authenticatable
         'foto_bukti_pembayaran',  
         'unlocked_babak2',
         'total_uang_babak2',
+        "harga_unlock"
     ];
 
     /**

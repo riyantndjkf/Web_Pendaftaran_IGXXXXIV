@@ -27,7 +27,7 @@ return new class extends Migration
             $table->boolean('jenis_sesi')->nullable();
             $table->integer('durasi');
             $table->integer('demand');
-            $table->enum('event', ['reward_amount * 1.5', 'maintenance * 1.5'])->nullable();
+            $table->text('event')->nullable();
             $table->timestamps();
         });
 

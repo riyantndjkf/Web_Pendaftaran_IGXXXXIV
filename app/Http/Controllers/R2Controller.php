@@ -86,13 +86,15 @@ class R2Controller extends Controller
             
             ];
         });
+
+
         $gameData = [
             'timer' => '00:00',
             'elapsed_seconds' => session('rally2_timer', 0),
             'demand' =>  $currentDemand  ,
             'capital' => $team->total_uang_babak2,
             'factories_locked' => !$team->unlocked_babak2,
-            'unlock_cost' => 100000,
+            'unlock_cost' => $team->harga_unlock,
             "machine"=> $allMachines,
             'factories' => $factories,
             "owned"=>$ownedMachines,
