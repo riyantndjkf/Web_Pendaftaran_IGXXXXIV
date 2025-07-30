@@ -10,6 +10,7 @@ class Session extends Model
     use HasFactory;
     protected $table = 'tsession';
     protected $fillable = [
+        "jenis_sesi",
         'durasi',
         'demand',
         'event',

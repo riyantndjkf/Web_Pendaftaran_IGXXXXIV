@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('harga_dasar');
             $table->integer('kapasitas_dasar')->default(0);
             $table->integer('base_time');
+            $table->integer('biaya_jual');
             $table->integer('biaya_maintenance');
             $table->timestamps();
         });
@@ -23,10 +24,10 @@ return new class extends Migration
         // Create tsession table
         Schema::create('tsession', function (Blueprint $table) {
             $table->id();
-            $table->integer('jenis_sesi')->nullable();
+            $table->boolean('jenis_sesi')->nullable();
             $table->integer('durasi');
             $table->integer('demand');
-            $table->enum('event', ['reward_amount * 1.5', 'maintenance * 1.5'])->nullable();
+            $table->text('event')->nullable();
             $table->timestamps();
         });
 
@@ -34,7 +35,7 @@ return new class extends Migration
         Schema::create('tsoalqr', function (Blueprint $table) {
             $table->id();
             $table->enum('level', ['1', '2', '3']);
-            $table->string('pertanyaan', 510);
+            $table->string('pertanyaan', 765);
             $table->integer('reward_amount');
             $table->string('option_1')->nullable();
             $table->string('option_2')->nullable();
@@ -62,7 +63,9 @@ return new class extends Migration
             $table->foreignId('team_id')->constrained('teams')->onDelete('restrict')->onUpdate('restrict');
             $table->foreignId('tmachine_id')->constrained('tmachine')->onDelete('restrict')->onUpdate('restrict');
             $table->enum('level', ['1', '2', '3']);
-            $table->boolean('is_active');
+            $table->integer('kapasitas_dasar')->default(0);
+            $table->integer('base_time');
+            $table->integer('biaya_jual');
             $table->boolean('operator_hired')->default(0);
             $table->timestamps();
         });
@@ -111,6 +114,20 @@ return new class extends Migration
             $table->boolean('reward_claimed');
             $table->timestamps();
         });
+
+        Schema::create('tconnectmachine', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('source_team_machine_id');
+            $table->unsignedBigInteger('target_team_machine_id');
+            $table->timestamps();
+
+            $table->foreign('source_team_machine_id')->references('id')->on('tteammachine')->onDelete('cascade');
+            $table->foreign('target_team_machine_id')->references('id')->on('tteammachine')->onDelete('cascade');
+
+            // UNIQUE agar tidak bisa ada duplikat koneksi
+            $table->unique(['source_team_machine_id', 'target_team_machine_id'], 'conn_source_target_unique');
+        });
+
     }
 
     public function down(): void
@@ -124,5 +141,7 @@ return new class extends Migration
         Schema::dropIfExists('tsoalqr');
         Schema::dropIfExists('tsession');
         Schema::dropIfExists('tmachine');
+        Schema::dropIfExists('tconnectmachine');
+
     }
 };

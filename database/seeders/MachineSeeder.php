@@ -19,6 +19,7 @@ class MachineSeeder extends Seeder
             'harga_dasar' => 3000,
             'kapasitas_dasar' => 5,
             'base_time' => 5, // dalam menit
+            "biaya_jual"=>2000,
             'biaya_maintenance' => 2500,
         ]);
 
@@ -28,6 +29,7 @@ class MachineSeeder extends Seeder
             'harga_dasar' => 4000,
             'kapasitas_dasar' => 10,
             'base_time' => 7, // dalam menit
+            "biaya_jual"=>3000,
             'biaya_maintenance' => 2500,
         ]);
 
@@ -37,6 +39,7 @@ class MachineSeeder extends Seeder
             'harga_dasar' => 2500,
             'kapasitas_dasar' => 8,
             'base_time' => 6, // dalam menit
+            "biaya_jual"=>2000,
             'biaya_maintenance' => 2500,
         ]);
 
@@ -46,6 +49,7 @@ class MachineSeeder extends Seeder
             'harga_dasar' => 3000,
             'kapasitas_dasar' => 6,
             'base_time' => 4, // dalam menit
+            "biaya_jual"=>2000,
             'biaya_maintenance' => 2500,
         ]);
 Machine::create([
@@ -54,6 +58,7 @@ Machine::create([
             'harga_dasar' => 3000,
             'kapasitas_dasar' => 5,
             'base_time' => 5, // dalam menit
+            "biaya_jual"=>2000,
             'biaya_maintenance' => 2500,
         ]);
 
@@ -63,6 +68,7 @@ Machine::create([
             'harga_dasar' => 4000,
             'kapasitas_dasar' => 10,
             'base_time' => 7, // dalam menit
+            "biaya_jual"=>3000,
             'biaya_maintenance' => 2500,
         ]);
 
@@ -72,6 +78,7 @@ Machine::create([
             'harga_dasar' => 2500,
             'kapasitas_dasar' => 8,
             'base_time' => 6, // dalam menit
+            "biaya_jual"=>2000,
             'biaya_maintenance' => 2500,
         ]);
 
@@ -81,6 +88,7 @@ Machine::create([
             'harga_dasar' => 3000,
             'kapasitas_dasar' => 6,
             'base_time' => 4, // dalam menit
+            "biaya_jual"=>2000,
             'biaya_maintenance' => 2500,
         ]);Machine::create([
             'name' => 'Cutting',
@@ -88,6 +96,7 @@ Machine::create([
             'harga_dasar' => 3000,
             'kapasitas_dasar' => 5,
             'base_time' => 5, // dalam menit
+            "biaya_jual"=>2000,
             'biaya_maintenance' => 2500,
         ]);
 
@@ -97,6 +106,7 @@ Machine::create([
             'harga_dasar' => 4000,
             'kapasitas_dasar' => 10,
             'base_time' => 7, // dalam menit
+            "biaya_jual"=>3000,
             'biaya_maintenance' => 2500,
         ]);
 
@@ -106,6 +116,7 @@ Machine::create([
             'harga_dasar' => 2500,
             'kapasitas_dasar' => 8,
             'base_time' => 6, // dalam menit
+            "biaya_jual"=>2000,
             'biaya_maintenance' => 2500,
         ]);
 
@@ -115,6 +126,7 @@ Machine::create([
             'harga_dasar' => 3000,
             'kapasitas_dasar' => 6,
             'base_time' => 4, // dalam menit
+            "biaya_jual"=>2000,
             'biaya_maintenance' => 2500,
         ]);
         

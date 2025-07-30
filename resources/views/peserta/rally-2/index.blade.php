@@ -15,11 +15,7 @@
         <div class="flex flex-col bg-[#9ABDF6] w-1/2 rounded-[20px] py-4 px-3 gap-2">
             <div class="rounded text-black text-sm flex items-center justify-between w-full">
                 <span class="font-normal text-xl text-black">DEMAND</span>
-                <span class="font-normal text-xl text-black">{{ $gameData['demand']['current'] }}</span>
-            </div>
-            <div class="rounded text-black text-sm flex items-center justify-between w-full">
-                <span class="font-normal text-xl text-black">FULLFILED</span>
-                <span class="font-normal text-xl text-black">{{ $gameData['demand']['fulfilled'] }}</span>
+                <span class="font-normal text-xl text-black">{{ $gameData['demand'] }}</span>
             </div>
         </div>
         <div class="text-black text-right">

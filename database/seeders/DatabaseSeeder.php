@@ -26,6 +26,9 @@ class DatabaseSeeder extends Seeder
             SoalQrSeeder::class,
             MysteryEnvelopeSeeder::class,
             AccSeeder::class,
+            KomponenSeeder::class,
+            PosSeeder::class,
+            PosStokSeeder::class,
     ]);
     }
 }

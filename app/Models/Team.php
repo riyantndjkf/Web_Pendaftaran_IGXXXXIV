@@ -22,6 +22,7 @@ class Team extends Authenticatable
         'foto_bukti_pembayaran',  
         'unlocked_babak2',
         'total_uang_babak2',
+        "harga_unlock"
     ];
 
     /**
@@ -48,5 +49,17 @@ class Team extends Authenticatable
     public function members()
     {
         return $this->hasMany(Member::class,"team_id");
+    }
+     public function komponen()
+    {
+        return $this->hasOne(Komponen::class, 'team_id');
+    }
+    public function sepeda()
+    {
+        return $this->hasOne(Sepeda::class);
+    }
+    public function poinBabak1()
+    {
+        return $this->hasOne(PoinBabak1::class);
     }
 }

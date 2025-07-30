@@ -28,27 +28,27 @@
 
             <div class="flex flex-col gap-4 mt-4">
                 @if ($soal->option_1)
-                    <button class="w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this)">
+                    <button class="w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this);">
                         <span class="text-lg font-medium text-black">{{ $soal->option_1 }}</span>
                     </button>
 
-                    <button class="w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this)">
+                    <button class="w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this);">
                         <span class="text-lg font-medium text-black">{{ $soal->option_2 }}</span>
                     </button>
                 
-                    <button class="w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this)">
+                    <button class="w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this);">
                         <span class="text-lg font-medium text-black">{{ $soal->option_3 }}</span>
                     </button>
 
-                    <button class="w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this)">
+                    <button class="w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this);">
                         <span class="text-lg font-medium text-black">{{ $soal->option_4 }}</span>
                     </button>
                 @elseif ($soal->jawaban_benar === 'TRUE' || $soal->jawaban_benar === 'FALSE')
-                    <button class="w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this)">
+                    <button class="w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this);">
                         <span class="text-lg font-medium text-black">TRUE</span>
                     </button>
 
-                    <button class="w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this)">
+                    <button class="w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this);">
                         <span class="text-lg font-medium text-black">FALSE</span>
                     </button>
                 @else
@@ -71,7 +71,7 @@
 
             <button type = "submit" id="submitBtn"
                 class="w-full bg-[#FFB886] mt-4 text-black font-bold py-4 px-6 rounded-lg text-lg cursor-pointer"
-                onclick="submitAnswer()">
+                onclick="submitAnswer();">
                 SUBMIT
             </button>
         </div>
@@ -111,7 +111,7 @@
 @endsection
 
 @push('scripts')
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    {{-- <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script> --}}
     <script id="MathJax-script" async
         src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 
@@ -120,6 +120,7 @@
         let jawabanSudahDikirim = false;
 
         function selectOption(button) {
+            console.log("MASUK");
             document.querySelectorAll('button[onclick*="selectOption"]').forEach(btn => {
                 btn.style.backgroundColor = '';
                 btn.style.color = '';
@@ -138,12 +139,12 @@
             document.getElementById('submitBtn').disabled = false;
         }
 
+
         document.addEventListener('DOMContentLoaded', function () {
             const input = document.getElementById('jawabanInput');
 
             if (input) {
                 input.addEventListener('input', function () {
-                    // Ganti koma dengan titik
                     input.value = input.value.replace(',', '.');
                 });
             }
@@ -151,9 +152,11 @@
             window.addEventListener('beforeunload', function (e) {
                 if (!jawabanSudahDikirim) {
                     e.preventDefault();
-                    e.returnValue = ''; // WAJIB untuk memunculkan prompt konfirmasi
+                    e.returnValue = '';
                 }
-        });
+            });
+        }); // ✅ Sudah ditutup dengan benar
+
 
         /* Fungsi dibawah sebenernya mau dipake tapi tabrakan sama input desimal :(
         function formatRibuan(input) {
@@ -296,6 +299,5 @@
                 submitAnswer();
             }
         });
-
     </script>
 @endpush
