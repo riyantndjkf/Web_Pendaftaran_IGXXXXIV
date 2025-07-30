@@ -101,6 +101,15 @@ Route::group([
         session()->put("akses_envelope_$id", true);
         return redirect()->route('peserta.rally-2.claim-envelope', $id);
     });
+
+        //================MAIN RALLY 2=======================
+    Route::post('/rally2/buy', [R2Controller::class, 'buyMachine'])->name('rally2.buy');
+    Route::post('/rally2/upgrade', [R2Controller::class, 'upgradeMachine'])->name('rally2.upgrade');
+    Route::post('/rally2/sell', [R2Controller::class, 'sell'])->name('rally2.sell');
+    Route::post('/rally2/connect-machine', [R2Controller::class, 'storeConnection'])->name('rally2.connect');;
+
+    // =================== RALLY 1===================
+    Route::get('/rally1', [R1Controller::class, 'index'])->name('rally-1.index');
 });
 
 
@@ -112,13 +121,7 @@ Route::group([
         abort(404);
     });
 
-        //================MAIN RALLY 2=======================
-    Route::post('/rally2/buy', [R2Controller::class, 'buyMachine'])->name('rally2.buy');
-    Route::post('/rally2/upgrade', [R2Controller::class, 'upgradeMachine'])->name('rally2.upgrade');
-    Route::post('/rally2/sell', [R2Controller::class, 'sell'])->name('rally2.sell');
-
-    // =================== RALLY 1===================
-    Route::get('/rally1', [R1Controller::class, 'index'])->name('rally-1.index');
+    
 
 
  Route::get('/mystery-envelope/{id}', function ($id) {

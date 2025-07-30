@@ -57,7 +57,7 @@
                 class="w-full bg-green-500 text-white py-3 rounded-lg font-bold hover:bg-green-600 transition">
                 UPGRADE
             </button>
-            <button onclick="showConnectModal()"
+            <button id="connectButton" onclick="showConnectModal()"
                 class="w-full bg-blue-500 text-white py-3 rounded-lg font-bold hover:bg-blue-600 transition">
                 CONNECT
             </button>
@@ -221,10 +221,10 @@
     let selectedWorkerFactoryIndex = null;
     let selectedWorkerFactory = null;
 
+
    function showFactoryInfo(index, factory) {
         selectedFactoryIndex = index;
         selectedFactory = factory;
-                console.log(selectedFactory)
 
         document.getElementById('machineTitle').textContent = `Machine ${factory.name} Info`;
         document.getElementById('machineLevel').textContent = `Level ${factory.level || 1}`;
@@ -237,13 +237,25 @@
 
         const isOwned = factory.owned === true || factory.owned === "true";
 
-        if (isOwned) {
-        buyButton.classList.add('hidden');
-        ownedButtons.classList.remove('hidden');
+        const connectButton = document.getElementById('connectButton');
+
+        if (factory.owned) {
+            buyButton.classList.add('hidden');
+            ownedButtons.classList.remove('hidden');
+
+            // 👇 Sembunyikan tombol CONNECT kalau jenis = 4
+            if (factory.jenis == 4 && connectButton) {
+                connectButton.classList.add('hidden');
+            } else if (connectButton) {
+                connectButton.classList.remove('hidden');
+            }
+
         } else {
-        buyButton.classList.remove('hidden');
-        ownedButtons.classList.add('hidden');
+            ownedButtons.classList.add('hidden');
+            buyButton.classList.remove('hidden');
         }
+
+
 
 
         showModal('factoryInfoModal');
@@ -461,48 +473,122 @@
         hideModal('connectModal');
     }
 
-    function populateFactoryList() {
-        const factoryList = document.getElementById('factoryList');
-        factoryList.innerHTML = '';
+ function populateFactoryList() {
+    const factoryList = document.getElementById('factoryList');
+    factoryList.innerHTML = '';
 
-        factoriesData.forEach((factory, index) => {
-            if (index !== selectedFactoryIndex && factory.unlocked) {
-                const factoryItem = document.createElement('button');
-                const isOwned = factory.owned;
-                const statusText = isOwned ? `Level ${factory.level || 1}` : 'Not owned';
-                const statusColor = isOwned ? 'text-gray-600' : 'text-orange-600';
+    const fromOwnedId = selectedFactory.owned_id;
+    const nextJenis = parseInt(selectedFactory.jenis) + 1;
 
-                factoryItem.className = `w-full p-3 ${isOwned ? 'bg-gray-100 hover:bg-gray-200' : 'bg-orange-50 hover:bg-orange-100'} rounded-lg text-left transition`;
-                factoryItem.innerHTML = `
-                    <div class="font-semibold">Factory ${String.fromCharCode(65 + index)}</div>
-                    <div class="text-sm ${statusColor}">${statusText}</div>
-                `;
-                factoryItem.onclick = () => connectFactories(selectedFactoryIndex, index);
-                factoryList.appendChild(factoryItem);
-            }
-        });
+    const connectionFromThisFactory = selectedFactory.connections.find(c => c.from === fromOwnedId);
 
-        if (factoryList.children.length === 0) {
-            factoryList.innerHTML = '<p class="text-gray-500 py-4">No available factories to connect</p>';
+    // Kalau sudah terkoneksi (sebagai FROM), tampilkan info saja
+    if (connectionFromThisFactory) {
+        const connectedFactory = factoriesData.find(f => f.owned_id === connectionFromThisFactory.to);
+
+        if (connectedFactory) {
+            const factoryItem = document.createElement('div');
+            factoryItem.className = `
+                w-full p-4 bg-blue-50 border border-blue-300 shadow-md rounded-xl text-left
+            `.trim();
+
+            factoryItem.innerHTML = `
+                <div class="font-semibold text-blue-800 text-lg">
+                    Terhubung ke Factory ${String.fromCharCode(65 + factoriesData.indexOf(connectedFactory))}
+                </div>
+                <div class="text-sm text-blue-700 mt-1">
+                    Jenis ${connectedFactory.jenis}, Level ${connectedFactory.level || 1}
+                </div>
+            `;
+            factoryList.appendChild(factoryItem);
+        } else {
+            factoryList.innerHTML = '<p class="text-red-500 py-4">Koneksi ditemukan, tapi factory tujuan tidak ditemukan</p>';
         }
+
+        return; // sudah konek, keluar dari fungsi
     }
+
+    // 🔍 Fungsi bantu: cek apakah factory ini sudah jadi FROM
+    function isAlreadyUsedAsFrom(ownedId) {
+        return factoriesData.some(f =>
+            (f.connections || []).some(c => c.from === ownedId)
+        );
+    }
+
+    // Cari kandidat factory yang bisa dikoneksikan
+    let candidateCount = 0;
+
+    factoriesData.forEach((factory, index) => {
+        const isValidConnection =
+            factory.owned &&
+            index !== selectedFactoryIndex &&
+            parseInt(factory.jenis) === nextJenis &&
+            !isAlreadyUsedAsFrom(factory.owned_id);
+
+        if (isValidConnection) {
+            candidateCount++;
+
+            const factoryItem = document.createElement('button');
+            factoryItem.className = `
+                w-full p-4 bg-green-50 border border-green-300 shadow-md rounded-xl
+                text-left transition hover:bg-green-100 hover:scale-[1.02] hover:shadow-lg cursor-pointer
+            `.trim();
+
+            factoryItem.innerHTML = `
+                <div class="font-semibold text-green-800 text-lg">
+                    Factory ${String.fromCharCode(65 + index)}
+                </div>
+                <div class="text-sm text-green-700 mt-1">
+                    Level ${factory.level || 1}
+                </div>
+            `;
+            factoryItem.onclick = () => connectFactories(selectedFactoryIndex, index);
+            factoryList.appendChild(factoryItem);
+        }
+    });
+
+    if (candidateCount === 0) {
+        factoryList.innerHTML = '<p class="text-gray-500 py-4">Tidak ada factory jenis berikutnya yang bisa dikoneksikan</p>';
+    }
+
+    // Debug
+    console.log("selectedFactory:", selectedFactory);
+    console.log("factoriesData:", factoriesData);
+}
 
     function connectFactories(fromIndex, toIndex) {
-        const existingConnection = connections.find(conn =>
-            (conn.from === fromIndex && conn.to === toIndex) ||
-            (conn.from === toIndex && conn.to === fromIndex)
-        );
+    const fromFactory = factoriesData[fromIndex];
+    const toFactory = factoriesData[toIndex];
 
-        if (!existingConnection) {
-            connections.push({ from: fromIndex, to: toIndex });
-            drawConnections();
-            alert(`Factory ${String.fromCharCode(65 + fromIndex)} connected to Factory ${String.fromCharCode(65 + toIndex)}!`);
-        } else {
-            alert('Factories are already connected!');
+    const payload = {
+        source_team_machine_id: fromFactory.owned_id,
+        target_team_machine_id: toFactory.owned_id,
+    };
+
+    console.log("🔧 Payload to send:", payload);
+
+    $.ajax({
+        url: "{{ route('peserta.rally2.connect') }}",
+        method: 'POST',
+        data: JSON.stringify(payload),
+        contentType: 'application/json',
+        headers: {
+              "X-CSRF-TOKEN": window.Laravel.csrfToken
+        },
+        success: function(response) {
+            alert("✅ Koneksi berhasil disimpan!");
+            hideConnectModal();
+            location.reload(); // atau update tampilan saja
+        },
+        error: function(xhr, status, error) {
+            console.error("❌ AJAX Error:", error);
+            console.log("📄 Response text:", xhr.responseText);
+            alert("❌ Gagal menghubungkan factory: " + (xhr.responseJSON?.message || "Unknown error"));
         }
+    });
+}
 
-        hideConnectModal();
-    }
+
 
     function drawConnections() {
         const svg = document.getElementById('connectionArrows');

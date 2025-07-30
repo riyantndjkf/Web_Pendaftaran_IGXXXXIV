@@ -114,6 +114,20 @@ return new class extends Migration
             $table->boolean('reward_claimed');
             $table->timestamps();
         });
+
+        Schema::create('tconnectmachine', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('source_team_machine_id');
+            $table->unsignedBigInteger('target_team_machine_id');
+            $table->timestamps();
+
+            $table->foreign('source_team_machine_id')->references('id')->on('tteammachine')->onDelete('cascade');
+            $table->foreign('target_team_machine_id')->references('id')->on('tteammachine')->onDelete('cascade');
+
+            // UNIQUE agar tidak bisa ada duplikat koneksi
+            $table->unique(['source_team_machine_id', 'target_team_machine_id'], 'conn_source_target_unique');
+        });
+
     }
 
     public function down(): void
@@ -127,5 +141,7 @@ return new class extends Migration
         Schema::dropIfExists('tsoalqr');
         Schema::dropIfExists('tsession');
         Schema::dropIfExists('tmachine');
+        Schema::dropIfExists('tconnectmachine');
+
     }
 };

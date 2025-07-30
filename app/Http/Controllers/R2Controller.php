@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Machine;
 use App\Models\TeamMachine;
 use Carbon\Carbon;
+use DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\SoalQR;
 use App\Models\MysteryEnvelope;
@@ -25,6 +26,8 @@ class R2Controller extends Controller
         // Ambil mesin yang dimiliki tim
         $ownedMachines = TeamMachine::where('team_id', $team->id)->get()->keyBy('tmachine_id');
 
+       
+
         $factories = $allMachines->map(function ($machine) use ($ownedMachines) {
             $owned = $ownedMachines->has($machine->id);
             $ownedData = $ownedMachines->get($machine->id);
@@ -36,6 +39,28 @@ class R2Controller extends Controller
                     'time_per_level' => [],
                     'sell_prices' => [],
                 ]);
+
+           $connections = [];
+
+            if ($owned) {
+                $myId = $ownedData->id;
+
+                // Ambil semua koneksi yang melibatkan mesin ini, baik sebagai from atau to
+                $connections = DB::table('tconnectmachine')
+                    ->where(function ($q) use ($myId) {
+                        $q->where('source_team_machine_id', $myId)
+                        ->orWhere('target_team_machine_id', $myId);
+                    })
+                    ->get()
+                    ->map(function ($conn) {
+                        return [
+                            'from' => $conn->source_team_machine_id,
+                            'to' => $conn->target_team_machine_id,
+                        ];
+                    })
+                    ->toArray();
+            }
+
             return [
                 'machine_id' => $machine->id,
                 'name' => $machine->name,
@@ -53,6 +78,8 @@ class R2Controller extends Controller
                 'capacity_per_level' => $upgradeConfig['capacity_per_level'],
                 'time_per_level' => $upgradeConfig['time_per_level'],
                 'sell_prices' => $upgradeConfig['sell_prices'],
+                 'connections' => $connections,
+            
             ];
         });
         $gameData = [
@@ -68,6 +95,7 @@ class R2Controller extends Controller
             "machine"=> $allMachines,
             'factories' => $factories,
             "owned"=>$ownedMachines,
+            
         ];
 
         return view('peserta.rally-2.index', compact('gameData'));
@@ -337,6 +365,31 @@ class R2Controller extends Controller
     }
 
 
+    public function storeConnection(Request $request)
+    {
+        Log::info('🔧 storeConnection dipanggil', $request->all());
+
+        $validated = $request->validate([
+            'source_team_machine_id' => 'required|exists:tteammachine,id',
+            'target_team_machine_id' => 'required|exists:tteammachine,id',
+        ]);
+
+        try {
+            DB::table('tconnectmachine')->insert([
+                'source_team_machine_id' => $validated['source_team_machine_id'],
+                'target_team_machine_id' => $validated['target_team_machine_id'],
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('❌ Gagal insert koneksi: ' . $e->getMessage());
+            return response()->json(['message' => 'Gagal menyimpan koneksi'], 500);
+        }
+
+        Log::info('✅ Koneksi disimpan:', $validated);
+
+        return response()->json(['message' => 'Koneksi berhasil disimpan']);
+    }
 
 
 }
