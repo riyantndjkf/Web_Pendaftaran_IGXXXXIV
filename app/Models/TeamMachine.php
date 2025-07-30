@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class TeamMachine extends Model
 {
     protected $table = 'tteammachine';
-    protected $fillable = ['team_id', 'tmachine_id', 'level',  'operater_hired',"kapasitas_dasar","base_time"];
+    protected $fillable = ['team_id', 'tmachine_id', 'level',  'operater_hired',"kapasitas_dasar","base_time",'biaya_jual'];
 
     public function team() {
         return $this->belongsTo(Team::class, 'team_id');

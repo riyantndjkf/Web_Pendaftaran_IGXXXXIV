@@ -17,6 +17,7 @@ class Machine extends Model
         'harga_dasar',
         'kapasitas_dasar',
         'base_time',
+        'biaya_jual',
         'biaya_maintenance',
     ];
 

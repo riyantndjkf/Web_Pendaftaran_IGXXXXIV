@@ -29,43 +29,30 @@ class R2Controller extends Controller
             $owned = $ownedMachines->has($machine->id);
             $ownedData = $ownedMachines->get($machine->id);
 
-            $kapasitasDasar = $owned ? ($ownedData->kapasitas_dasar ?? $machine->kapasitas_dasar) : $machine->kapasitas_dasar;
-            $baseTime = $owned ? ($ownedData->base_time ?? $machine->base_time) : $machine->base_time;
-            $upgradePrices = [
-                2 => $machine->harga_dasar + 1000,
-                3 => $machine->harga_dasar + 2000,
-            ];
-
-            $capacityPerLevel = [
-                1 => $machine->kapasitas_dasar,
-                2 => $machine->kapasitas_dasar + 1,
-                3 => $machine->kapasitas_dasar + 2,
-            ];
-
-            $timePerLevel = [
-                1 => $machine->base_time,
-                2 => max(1, $machine->base_time - 1),
-                3 => max(1, $machine->base_time - 2),
-            ];
-
-           
+            $level = $owned ? $ownedData->level : 1;
+            $upgradeConfig = config("machine_upgrade.{$machine->jenis}", [
+                    'upgrade_prices' => [],
+                    'capacity_per_level' => [],
+                    'time_per_level' => [],
+                    'sell_prices' => [],
+                ]);
             return [
                 'machine_id' => $machine->id,
                 'name' => $machine->name,
                 'jenis' => $machine->jenis,
                 'harga_dasar' => $machine->harga_dasar,
-                'kapasitas_dasar' => $kapasitasDasar,
-                'base_time' => $baseTime,
+                'kapasitas_dasar' => $upgradeConfig['capacity_per_level'][$level] ?? $machine->kapasitas_dasar,
+                'base_time' => $upgradeConfig['time_per_level'][$level] ?? $machine->base_time,
                 'biaya_maintenance' => $machine->biaya_maintenance,
                 'owned' => $owned,
                 'owned_id' => $owned ? $ownedData->id : null,
-                'level' => $owned ? $ownedData->level : null,
-                
+                'level' => $level,
                 'operator_hired' => $owned ? $ownedData->operator_hired : null,
 
-                'upgrade_prices' => $upgradePrices,
-                'capacity_per_level' => $capacityPerLevel,
-                'time_per_level' => $timePerLevel,
+                'upgrade_prices' => $upgradeConfig['upgrade_prices'],
+                'capacity_per_level' => $upgradeConfig['capacity_per_level'],
+                'time_per_level' => $upgradeConfig['time_per_level'],
+                'sell_prices' => $upgradeConfig['sell_prices'],
             ];
         });
         $gameData = [
@@ -248,6 +235,7 @@ class R2Controller extends Controller
                 'level' => 1,
                 'operator_hired' => false,
                 "base_time"=>$machine->base_time,
+                "biaya_jual"=> $machine->biaya_jual,
                 "kapasitas_dasar"=>$machine->kapasitas_dasar,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
@@ -273,7 +261,7 @@ class R2Controller extends Controller
         $price = $request->input('price');
         $newCapacity = $request->input('new_capacity');
         $newTime = $request->input('new_time');
-
+        $newSell = $request->input('sell');
         $teamMachine = TeamMachine::where('id', $ownedId)
             ->where('team_id', $team->id)
             ->first();
@@ -302,8 +290,9 @@ class R2Controller extends Controller
         $teamMachine->level = $nextLevel;
 
         // (Opsional) simpan kapasitas dan waktu baru jika ada kolomnya
-        $teamMachine->kapasitas_dasar = $newCapacity ?? $teamMachine->kapasitas;
-        $teamMachine->base_time = $newTime ?? $teamMachine->waktu;
+        $teamMachine->kapasitas_dasar = $newCapacity ;
+        $teamMachine->base_time = $newTime ;
+        $teamMachine->biaya_jual = $newSell ;
 
         $teamMachine->save();
 
@@ -313,6 +302,37 @@ class R2Controller extends Controller
             'level' => $nextLevel,
             'kapasitas_dasar' => $newCapacity,
             'base_time' => $newTime,
+        ]);
+    }
+    public function sell(Request $request)
+    {
+        $request->validate([
+            'owned' => 'required|integer',
+            'price' => 'required|integer|min:0',
+        ]);
+
+        $user = Auth::user();
+        $team = Team::where('nama_tim', $user->name)->firstOrFail();
+
+        // Cek mesin milik tim
+        $teamMachine = TeamMachine::where('id', $request->owned)
+            ->where('team_id', $team->id)
+            ->first();
+
+        if (!$teamMachine) {
+            return response()->json(['error' => 'Mesin tidak ditemukan atau bukan milik tim.'], 403);
+        }
+
+        // Hapus mesin
+        $teamMachine->delete();
+
+        // Tambahkan saldo tim
+        $team->total_uang_babak2 += $request->price;
+        $team->save();
+
+        return response()->json([
+            'message' => 'Mesin berhasil dijual!',
+            'capital' => $team->total_uang_babak2
         ]);
     }
 

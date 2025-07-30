@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('harga_dasar');
             $table->integer('kapasitas_dasar')->default(0);
             $table->integer('base_time');
+            $table->integer('biaya_jual');
             $table->integer('biaya_maintenance');
             $table->timestamps();
         });
@@ -64,6 +65,7 @@ return new class extends Migration
             $table->enum('level', ['1', '2', '3']);
             $table->integer('kapasitas_dasar')->default(0);
             $table->integer('base_time');
+            $table->integer('biaya_jual');
             $table->boolean('operator_hired')->default(0);
             $table->timestamps();
         });

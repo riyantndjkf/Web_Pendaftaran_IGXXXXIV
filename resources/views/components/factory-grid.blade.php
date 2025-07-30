@@ -224,12 +224,13 @@
    function showFactoryInfo(index, factory) {
         selectedFactoryIndex = index;
         selectedFactory = factory;
-        
+                console.log(selectedFactory)
+
         document.getElementById('machineTitle').textContent = `Machine ${factory.name} Info`;
         document.getElementById('machineLevel').textContent = `Level ${factory.level || 1}`;
         document.getElementById('machineCapacity').textContent = `Kapasitas: ${factory.kapasitas_dasar || 5}`;
         document.getElementById('machineTime').textContent = `Waktu: ${factory.base_time || 6} menit`;
-        document.getElementById('machinePrice').textContent = `$${factory.harga_dasar || 3000}`;
+        document.getElementById('machinePrice').textContent = `$${factory.sell_prices[selectedFactory.level] || 3000}`;
 
         const buyButton = document.getElementById('buyButton');
         const ownedButtons = document.getElementById('ownedButtons');
@@ -309,10 +310,8 @@
 
 
     function showUpgradeModal() {
-        const currentLevel = parseInt(selectedFactory.level) ;
-        
+        const currentLevel = parseInt(selectedFactory.level);
         const nextLevel = currentLevel + 1;
-
         if (nextLevel > 3) {
             alert("Mesin sudah pada level maksimum.");
             return;
@@ -322,11 +321,14 @@
         const capacities = selectedFactory.capacity_per_level || {};
         const times = selectedFactory.time_per_level || {};
 
+        const nextCapacity = capacities[nextLevel] ?? 'Tidak tersedia';
+        const nextTime = times[nextLevel] ?? 'Tidak tersedia';
+        const nextPrice = upgradePrices[nextLevel] ?? 'Tidak tersedia';
 
         document.getElementById('upgradeFromTo').textContent = `Level ${currentLevel} → Level ${nextLevel}`;
-        document.getElementById('upgradeCapacity').textContent = `Kapasitas: ${capacities[nextLevel]} unit`;
-        document.getElementById('upgradeTime').textContent = `Waktu: ${times[nextLevel]} menit`;
-        document.getElementById('upgradePrice').textContent = `$${upgradePrices[nextLevel]}`;
+        document.getElementById('upgradeCapacity').textContent = `Kapasitas: ${nextCapacity} unit`;
+        document.getElementById('upgradeTime').textContent = `Waktu: ${nextTime} menit`;
+        document.getElementById('upgradePrice').textContent = `$${nextPrice}`;
 
         hideFactoryInfo();
         showModal('upgradeModal');
@@ -337,7 +339,7 @@
         hideModal('upgradeModal');
     }
 
-     function confirmUpgrade() {
+    function confirmUpgrade() {
         const owned = selectedFactory.owned_id;
         const currentLevel = parseInt(selectedFactory.level);
         const nextLevel = currentLevel + 1;
@@ -345,18 +347,20 @@
         const upgradePrices = selectedFactory.upgrade_prices || {};
         const capacities = selectedFactory.capacity_per_level || {};
         const times = selectedFactory.time_per_level || {};
+        const sells = selectedFactory.sell_prices || {};
 
         const price = upgradePrices[nextLevel];
         const newCapacity = capacities[nextLevel];
         const newTime = times[nextLevel];
+        const sell = sells[nextLevel];
 
-        console.log("selectedFactory:", {
-            owned,
-            nextLevel,
-            price,
-            newCapacity,
-            newTime
-        });
+        // Validasi agar tidak mengirim data kosong
+        if (price === undefined || newCapacity === undefined || newTime === undefined || sell === undefined) {
+            alert("Data upgrade tidak tersedia.");
+            hideUpgradeModal();
+            return;
+        }
+
         fetch("{{ route('peserta.rally2.upgrade') }}", {
             method: "POST",
             headers: {
@@ -368,7 +372,8 @@
                 next_level: nextLevel,
                 price: price,
                 new_capacity: newCapacity,
-                new_time: newTime
+                new_time: newTime,
+                sell: sell
             })
         })
         .then(res => res.json())
@@ -394,7 +399,10 @@
 
     
     function showSellModal() {
-        const sellPrice = Math.floor((selectedFactory.price || 3000) * 0.7);
+        const sellPrices = selectedFactory.sell_prices || {};
+        const currentLevel = parseInt(selectedFactory.level) || 1;
+        const sellPrice = sellPrices[currentLevel] ?? Math.floor((selectedFactory.harga_dasar || 3000) * 0.7);
+
         document.getElementById('sellPrice').textContent = `+$${sellPrice}`;
 
         hideFactoryInfo();
@@ -406,7 +414,40 @@
     }
 
     function confirmSell() {
-        alert('Mesin Berhasil Dijual!');
+        const ownedId = selectedFactory.owned_id;
+        const currentLevel = parseInt(selectedFactory.level);
+        const sellPrices = selectedFactory.sell_prices || {};
+        const defaultSell = Math.floor((selectedFactory.harga_dasar || 3000) * 0.7);
+        const sellAmount = sellPrices[currentLevel] ?? defaultSell;
+
+        console.log(ownedId)
+        console.log(sellAmount)
+        fetch("{{ route('peserta.rally2.sell') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": window.Laravel.csrfToken
+            },
+            body: JSON.stringify({
+                owned: ownedId,
+                price: sellAmount
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                alert(data.message || "Mesin berhasil dijual!");
+                window.capital = data.capital;
+                location.reload();
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Terjadi kesalahan saat menjual mesin.");
+        });
+
         hideSellModal();
     }
 
