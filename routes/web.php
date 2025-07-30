@@ -107,6 +107,7 @@ Route::group([
     Route::post('/rally2/upgrade', [R2Controller::class, 'upgradeMachine'])->name('rally2.upgrade');
     Route::post('/rally2/sell', [R2Controller::class, 'sell'])->name('rally2.sell');
     Route::post('/rally2/connect-machine', [R2Controller::class, 'storeConnection'])->name('rally2.connect');;
+    Route::post('/rally2/hire-worker', [R2Controller::class, 'hireWorker'])->name('rally2.hire');
 
     // =================== RALLY 1===================
     Route::get('/rally1', [R1Controller::class, 'index'])->name('rally-1.index');

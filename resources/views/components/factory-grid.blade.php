@@ -32,9 +32,11 @@
                 @endif
             </div>
 
-            <img src="{{ asset('icons/icon_pekerja.svg') }}" alt="icon pekerja"
-                onclick="event.stopPropagation(); showWorkerModal({{ $index }}, {{ json_encode($factory) }})"
-                class="cursor-pointer hover:scale-110 transition-transform {{ $factory['owned'] ? '' : 'opacity-30 pointer-events-none' }}">
+            @if($factory['owned'] && $factory['operator_hired'] == 0)
+                <img src="{{ asset('icons/icon_pekerja.svg') }}" alt="icon pekerja"
+                    onclick="event.stopPropagation(); showWorkerModal({{ $index }}, {{ json_encode($factory) }})"
+                    class="cursor-pointer hover:scale-110 transition-transform">
+            @endif
         </div>
     @endforeach
 </div>
@@ -243,11 +245,17 @@
             buyButton.classList.add('hidden');
             ownedButtons.classList.remove('hidden');
 
-            // 👇 Sembunyikan tombol CONNECT kalau jenis = 4
             if (factory.jenis == 4 && connectButton) {
                 connectButton.classList.add('hidden');
-            } else if (connectButton) {
-                connectButton.classList.remove('hidden');
+            } 
+            // ✅ Tambahkan logika ini untuk disable jika belum sewa pekerja
+            else if ((factory.operator_hired === 0 || !factory.operator_hired) && connectButton) {
+                connectButton.disabled = true;
+                connectButton.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+            else if (connectButton) {
+                connectButton.disabled = false;
+                connectButton.classList.remove('hidden', 'opacity-50', 'cursor-not-allowed');
             }
 
         } else {
@@ -652,11 +660,12 @@
         selectedWorkerFactoryIndex = index;
         selectedWorkerFactory = factory;
 
-        if (!factory.unlocked) {
-            alert('Factory must be unlocked first!');
+        if (!factory.owned) {
+            alert('Factory must be dibeli terlebih dahulu!');
             return;
         }
-
+        
+        
         const workerTitle = document.getElementById('workerTitle');
         const workerPrice = document.getElementById('workerPrice');
         const hireButton = document.getElementById('hireButton');
@@ -691,9 +700,42 @@
     }
 
     function confirmHire() {
-        alert('Worker hired successfully!');
+        const ownedId = selectedWorkerFactory.owned_id;
+
+        if (window.capital < 1000) {
+            alert("Uang tidak mencukupi untuk menyewa pekerja.");
+            hideWorkerModal();
+            return;
+        }
+
+        $.ajax({
+            url: "{{ route('peserta.rally2.hire') }}",
+            type: "POST",
+            headers: {
+                'X-CSRF-TOKEN': window.Laravel.csrfToken
+            },
+            data: {
+                owned_id: ownedId,
+            },
+            success: function(data) {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    alert(data.message || "Pekerja berhasil disewa!");
+                    window.capital = data.capital;
+                    updateCapitalDisplay();
+                    location.reload();
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+                alert("Terjadi kesalahan saat menyewa pekerja.");
+            }
+        });
+
         hideWorkerModal();
     }
+
 
     function showLayoffConfirm() {
         document.getElementById('layoffCost').textContent = '-$500';

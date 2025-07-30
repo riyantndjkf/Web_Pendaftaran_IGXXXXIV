@@ -390,6 +390,54 @@ class R2Controller extends Controller
 
         return response()->json(['message' => 'Koneksi berhasil disimpan']);
     }
+    public function hireWorker(Request $request)
+    {
+        Log::info('🔧 [hireWorker] Request diterima', $request->all());
+
+        // Ubah validasi agar tidak pakai backtick, cukup string nama tabel
+        $request->validate([
+            'owned_id' => 'required|exists:tteammachine,id',
+        ]);
+
+        // Pastikan model mengarah ke tteammachine
+        $teamMachine = TeamMachine::findOrFail($request->owned_id);
+        $user = Auth::user();
+        $team = Team::where('nama_tim', $user->name)->firstOrFail();
+        Log::info('🧾 [hireWorker] Ditemukan mesin dan tim', [
+            'team_machine_id' => $teamMachine->id,
+            'team_id' => $team->id,
+            'machine_team_id' => $teamMachine->team_id,
+            'capital_sekarang' => $team->total_uang_babak2,
+            'harga' => $request->price,
+        ]);
+
+        if ($teamMachine->team_id !== $team->id) {
+            Log::warning('❌ [hireWorker] Unauthorized: Mesin bukan milik tim.');
+            return response()->json(['error' => 'Unauthorized action.'], 403);
+        }
+
+        if ($team->total_uang_babak2 < $request->price) {
+            Log::warning('❌ [hireWorker] Uang tidak cukup untuk sewa pekerja.');
+            return response()->json(['error' => 'Uang tidak mencukupi untuk menyewa pekerja.']);
+        }
+
+        $team->total_uang_babak2 -= 1000;
+        $team->save();
+
+        $teamMachine->operator_hired = true;
+        $teamMachine->save();
+
+        Log::info('✅ [hireWorker] Berhasil menyewa pekerja.', [
+            'sisa_capital' => $team->total_uang_babak2,
+            'operator_hired' => $teamMachine->operator_hired,
+        ]);
+
+        return response()->json([
+            'message' => 'Berhasil menyewa pekerja!',
+            'capital' => $team->total_uang_babak2
+        ]);
+    }
+
 
 
 }
