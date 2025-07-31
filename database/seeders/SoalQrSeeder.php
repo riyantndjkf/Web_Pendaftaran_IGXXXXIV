@@ -2267,7 +2267,7 @@ class SoalQrSeeder extends Seeder
                 'option_2' => '\( 298\ \text{K} \)',
                 'option_3' => '\( 313\ \text{K} \)',
                 'option_4' => '\( 325\ \text{K} \)',
-                'jawaban_benar' => '298 k',
+                'jawaban_benar' => '298 k',
                 'gambar_soal' => null
             ],
             [
@@ -2327,7 +2327,7 @@ class SoalQrSeeder extends Seeder
                 'option_2' => '\( 50\ \text{cm/s} \)',
                 'option_3' => '\( 55\ \text{cm/s} \)',
                 'option_4' => '\( 60\ \text{cm/s} \)',
-                'jawaban_benar' => '35 cm/s',
+                'jawaban_benar' => '35 cm/s',
                 'gambar_soal' => null
             ],
             [
@@ -2339,7 +2339,7 @@ class SoalQrSeeder extends Seeder
                 'option_2' => '\( 0{,}5\ \text{m/s} \)',
                 'option_3' => '\( 1\ \text{m/s} \)',
                 'option_4' => '\( 1{,}5\ \text{m/s} \)',
-                'jawaban_benar' => '0,25 m/s',
+                'jawaban_benar' => '0,25 m/s',
                 'gambar_soal' => null
             ],
             [
@@ -2363,7 +2363,7 @@ class SoalQrSeeder extends Seeder
                 'option_2' => '\( 41\ \text{rad/s}^2 \)',
                 'option_3' => '\( 39\ \text{rad/s}^2 \)',
                 'option_4' => '\( 18\ \text{rad/s}^2 \)',
-                'jawaban_benar' => '39 rad/s2',
+                'jawaban_benar' => '39 rad/s2',
                 'gambar_soal' => null
             ],
             [
@@ -2375,7 +2375,7 @@ class SoalQrSeeder extends Seeder
                 'option_2' => '\( 400\ \text{N} \)',
                 'option_3' => '\( 500\ \text{N} \)',
                 'option_4' => '\( 750\ \text{N} \)',
-                'jawaban_benar' => '750 n',
+                'jawaban_benar' => '750 n',
                 'gambar_soal' => null
             ],
             [
@@ -2387,7 +2387,7 @@ class SoalQrSeeder extends Seeder
                 'option_2' => '\( 400\ \text{K} \)',
                 'option_3' => '\( 450\ \text{K} \)',
                 'option_4' => '\( 500\ \text{K} \)',
-                'jawaban_benar' => '400 k',
+                'jawaban_benar' => '400 k',
                 'gambar_soal' => null
             ],
             [
@@ -2411,7 +2411,7 @@ class SoalQrSeeder extends Seeder
                 'option_2' => '\( 1{,}8\ \text{N} \)',
                 'option_3' => '\( 1{,}6\ \text{N} \)',
                 'option_4' => '\( 1{,}2\ \text{N} \)',
-                'jawaban_benar' => '1,8 n',
+                'jawaban_benar' => '1,8 n',
                 'gambar_soal' => null
             ],
             [
@@ -2424,7 +2424,7 @@ class SoalQrSeeder extends Seeder
                 'option_3' => '15 m',
                 'option_4' => '25 m',
                 'jawaban_benar' => '5 m',
-                'gambar_soal' => null
+                'gambar_soal' => 'Fisika_Mudah_4.png'
             ],
             [
                 'id' => 202,
@@ -2435,8 +2435,8 @@ class SoalQrSeeder extends Seeder
                 'option_2' => '\( 90\ \text{N} \)',
                 'option_3' => '\( 150\ \text{N} \)',
                 'option_4' => '\( 330\ \text{N} \)',
-                'jawaban_benar' => '330 n',
-                'gambar_soal' => null
+                'jawaban_benar' => '330 n',
+                'gambar_soal' => 'Fisika_Sedang_5.png'
             ],
             [
                 'id' => 203,
@@ -2447,8 +2447,8 @@ class SoalQrSeeder extends Seeder
                 'option_2' => '\( 1\ \text{V} \)',
                 'option_3' => '\( 3\ \text{V} \)',
                 'option_4' => '\( 4\ \text{V} \)',
-                'jawaban_benar' => '3 v',
-                'gambar_soal' => null
+                'jawaban_benar' => '3 v',
+                'gambar_soal' => 'Fisika_Sedang_12.png'
             ],
             [
                 'id' => 204,
@@ -2459,8 +2459,8 @@ class SoalQrSeeder extends Seeder
                 'option_2' => '\( 9\ \text{cm} \) di kanan \( P \)',
                 'option_3' => '\( 6\ \text{cm} \) di kanan \( P \)',
                 'option_4' => '\( 6\ \text{cm} \) di kiri \( Q \)',
-                'jawaban_benar' => '6 cm di kiri q',
-                'gambar_soal' => null
+                'jawaban_benar' => '6 cm di kiri q',
+                'gambar_soal' => 'Fisika_Sedang_13.png'
             ],
             [
                 'id' => 205,
@@ -2472,7 +2472,7 @@ class SoalQrSeeder extends Seeder
                 'option_3' => '\( (30, 20) \)',
                 'option_4' => '\( (30, 40) \)',
                 'jawaban_benar' => '(20,30)',
-                'gambar_soal' => null
+                'gambar_soal' => 'Fisika_Sulit_2.png'
             ],
             [
                 'id' => 206,
@@ -2483,8 +2483,8 @@ class SoalQrSeeder extends Seeder
                 'option_2' => '\( 3\ \text{m/s}^2 \)',
                 'option_3' => '\( 6\ \text{m/s}^2 \)',
                 'option_4' => '\( 10\ \text{m/s}^2 \)',
-                'jawaban_benar' => '3 m/s2',
-                'gambar_soal' => null
+                'jawaban_benar' => '3 m/s2',
+                'gambar_soal' => 'Fisika_Sulit_4.png'
             ],
             [
                 'id' => 207,
@@ -2495,7 +2495,7 @@ class SoalQrSeeder extends Seeder
                 'option_2' => '\( 75\ \text{m} \)',
                 'option_3' => '\( 95\ \text{m} \)',
                 'option_4' => '\( 125\ \text{m} \)',
-                'jawaban_benar' => '75 m',
+                'jawaban_benar' => '75 m',
                 'gambar_soal' => null
             ],
         ]);
