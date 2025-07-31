@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 use App\Models\Machine;
 use App\Models\TeamMachine;
 use Carbon\Carbon;
-use DB;
+// use DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\SoalQR;
 use App\Models\MysteryEnvelope;
 use App\Models\Team;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 use Illuminate\Http\Request;
 
@@ -180,6 +181,9 @@ class R2Controller extends Controller
 
     public function submitQR(Request $request, $id)
     {
+        $user = Auth::user();
+        $team = Team::where('nama_tim', $user->name)->firstOrFail();
+
         Log::info("ID Soal : " . $id);
         $soal = SoalQR::findOrFail($id);
 
@@ -204,6 +208,11 @@ class R2Controller extends Controller
         // Perbandingan
         $status = $jawabanUser === $jawabanBenar ? 'benar' : 'salah';
 
+        if ($status === 'benar') {
+            $team->total_uang_babak2 += $soal->reward_amount;
+            $team->save();
+        }
+
         return response()->json([
             'status' => $status,
             'reward' => $status === 'benar' ? $soal->reward_amount : null
@@ -213,6 +222,9 @@ class R2Controller extends Controller
     // MYSTERY ENVELOPE
     public function claim($id)
     {
+        $user = Auth::user();
+        $team = Team::where('nama_tim', $user->name)->firstOrFail();
+
         // Batasi hanya lewat scan (opsional, seperti soal)
         if (!session()->get("akses_envelope_$id")) {
             abort(403, "Akses hanya bisa dilakukan melalui QR Scan.");
@@ -225,12 +237,18 @@ class R2Controller extends Controller
         }
 
         // Cek apakah tim sudah klaim sebelumnya (opsional)
-        if ($envelope->tTeam_id) {
+        if ($envelope->team_id) {
             return redirect()
                 ->route('peserta.rally-2.scanner') // ganti ini dengan rute tempat peserta diarahkan kembali
                 ->with('error', 'Envelope ini sudah diklaim oleh tim lain.');
         }
 
+         // Tinggal update ID Team yang klaim
+        // $envelope->team_id =
+
+        $team->total_uang_babak2 += $envelope->reward_amount;
+        $team->save();
+        
         // Simpan ke log atau tandai sebagai sudah diklaim (opsional)
 
         // Kirim tampilan reward
