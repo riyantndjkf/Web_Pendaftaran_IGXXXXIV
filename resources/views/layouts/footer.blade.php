@@ -1,4 +1,5 @@
-<footer class="bg-[#1C110A] text-[#FDF6E3] px-6 py-16">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<footer class="bg-[#1C110A] text-[#FDF6E3] px-6 py-10 font-poppins">
     <div class="container mx-auto grid grid-cols-1 md:grid-cols-2 gap-12">
 
         <!-- Social Media -->

@@ -2,121 +2,142 @@
 
 @section('content')
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Pirata+One&display=swap');
+
+    @font-face {
+    font-family: 'Firlest';
+    src: url('/fonts/Firlest.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+    body {
+        background-color: #0c0c0c;
+        color: white;
+        background-image: url('{{ asset('images/Background_SingleRegistration.png') }}');
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: top center;
+    }
+
     .form-container {
-        background-color: #ffffff;
-        border-radius: 0.75rem;
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-                    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        background-color: rgba(255, 255, 255, 0.35);
+        border-radius: 1rem;
+        backdrop-filter: blur(10px);
+        padding: 2rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
     }
 
     .form-input {
-        border: 1px solid #d1d5db;
-        background-color: #f9fafb;
-        padding: 0.5rem 0.75rem;
+        background-color: rgba(255, 255, 255, 0.2);
+        border: none;
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        color: white;
         width: 100%;
-        border-radius: 0.375rem;
-        font-size: 0.875rem;
-        line-height: 1.25rem;
-        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .form-input::placeholder {
+        color: rgba(255, 255, 255, 0.7);
     }
 
     .form-input:focus {
-        border-color: #6366f1;
         outline: none;
-        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-        background-color: #ffffff;
+        border: 1px solid white;
+        background-color: rgba(255, 255, 255, 0.3);
     }
 
-    .btn {
-        display: inline-block;
-        padding: 0.75rem 1.5rem;
-        border-radius: 0.5rem;
+    .form-label {
         font-weight: 600;
-        font-size: 0.875rem;
-        cursor: pointer;
-        transition: background-color 0.3s, transform 0.2s;
-        text-align: center;
-    }
-
-    .btn:hover {
-        transform: translateY(-1px);
+        margin-bottom: 0.5rem;
     }
 
     .btn-primary {
-        background-color: #4f46e5;
+        background-color: #A8814F;
         color: white;
-        border: none;
+        border: 2px solid rgba(255, 255, 255, 0.25);
+        border-radius: 9999px;
+        padding: 0.75rem 2.5rem;
+        font-weight: 700;
+        font-size: 1rem;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(4px);
+        text-transform: uppercase;
+        transition: all 0.3s ease;
     }
 
     .btn-primary:hover {
-        background-color: #4338ca;
+        background-color: #c1812eff;
+        transform: translateY(-2px);
     }
 
-    .btn-secondary {
-        background-color: #6b7280;
-        color: white;
-        border: none;
-    }
+    .section-title {
+    font-family: 'Pirata One', cursive;
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
 
-    .btn-secondary:hover {
-        background-color: #4b5563;
+.font-pirata {
+    font-family: 'Pirata One', cursive;
+}
+
+.font-firlest {
+    font-family: 'Firlest', serif;
+}
+
+    @media (max-width: 768px) {
+        .form-container {
+            padding: 1rem;
+        }
+
+        .section-title {
+            font-size: 2rem;
+        }
     }
 </style>
-<div class="bg-gray-100 flex items-center justify-center min-h-screen p-4 text-black">
-    <div class="w-full max-w-4xl mx-auto">
-        <div class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-800">FORMULIR REGISTRASI TIM</h1>
+
+<div class="bg-[#0c0c0c] bg-opacity-10 min-h-screen flex flex-col items-center justify-start py-10 px-4">
+    <img src="{{ asset('images/Registration_Tulisan.png') }}" alt="Registration Title" class="section-title w-full max-w-lg object-contain mt-64">
+
+    <form action="{{ route('register') }}" method="POST" enctype="multipart/form-data" class="w-full max-w-4xl space-y-12">
+        @csrf
+
+        @if ($errors->any())
+            <div class="bg-red-600 text-white p-4 rounded-lg">
+                <strong class="block mb-2">Registrasi Gagal! Harap periksa kembali data Anda:</strong>
+                <ul class="list-disc pl-5">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        <div class="form-container">
+           <h2 class="text-4xl font-pirata text-white text-center mb-4">NAMA TEAM</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="text" name="nama_tim" placeholder="Nama Tim" class="form-input" required>
+                <input type="password" name="password" placeholder="Password Tim" class="form-input" required>
+                <input type="text" name="asal_sekolah" placeholder="Asal Sekolah" class="form-input md:col-span-2" required>
+            </div>
         </div>
 
-        <form action="{{ route('register') }}" method="POST" enctype="multipart/form-data" class="form-container rounded-lg p-6 md:p-8 shadow-lg">
-            @csrf
-
-            @if ($errors->any())
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-6" role="alert">
-                    <strong class="font-bold">Registrasi Gagal! Harap periksa kembali data Anda:</strong>
-                    <ul class="mt-2 list-disc list-inside">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            <div class="mb-8">
-                <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2 mb-6">Informasi Tim</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="nama_tim" class="block text-sm font-medium text-gray-700 mb-1">Nama Tim</label>
-                        <input type="text" id="nama_tim" name="nama_tim" value="{{ old('nama_tim') }}" class="form-input" required>
-                    </div>
-                    <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Password Tim</label>
-                        <input type="password" id="password" name="password" class="form-input" required>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label for="asal_sekolah" class="block text-sm font-medium text-gray-700 mb-1">Asal Sekolah</label>
-                        <input type="text" id="asal_sekolah" name="asal_sekolah" value="{{ old('asal_sekolah') }}" class="form-input" required>
-                    </div>
-                </div>
-            </div>
-
-            <h2 class="text-2xl font-semibold text-gray-700 border-b pb-2 mb-6">Informasi Anggota</h2>
-            @for ($i = 0; $i < 3; $i++)
+        @for ($i = 0; $i < 3; $i++)
+            <div class="form-container">
+                <h2 class="text-lg font-bold text-white mb-4">Data Anggota {{ $i + 1 }}{{ $i === 0 ? ' (Ketua)' : '' }}</h2>
                 @include('auth.partials.team_form_single', ['index' => $i])
-            @endfor
-
-            <div class="mt-6 pt-6 border-t">
-                <label for="foto_bukti_pembayaran" class="block text-sm font-medium text-gray-700 mb-1">Upload Bukti Pembayaran</label>
-                <input type="file" id="foto_bukti_pembayaran" name="foto_bukti_pembayaran" class="form-input file:mr-4 file:py-1 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-700 hover:file:bg-violet-100" required>
-                @error('foto_bukti_pembayaran') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
             </div>
+        @endfor
 
-            <div class="mt-8 flex items-center justify-center">
-                <button type="submit" class="btn btn-primary">
-                    Daftarkan Tim
-                </button>
-            </div>
-        </form>
-    </div>
+        <div class="form-container">
+            <label class="form-label block text-white">Upload Bukti Pembayaran</label>
+            <input type="file" name="foto_bukti_pembayaran" class="form-input" required>
+        </div>
+
+        <div class="flex justify-center">
+            <button type="submit" class="btn-primary">Daftarkan Tim</button>
+        </div>
+    </form>
 </div>
 @endsection

@@ -1,27 +1,3 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* src/index.css (or similar file imported into your project) */
-
-/* Example for self-hosting a font */
-@font-face {
-  font-family: 'YourCustomTitleFont'; /* This name matches 'custom-font-title' in tailwind.config.js */
-  src: url('./fonts/YourCustomTitleFont.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap; /* Improve font loading experience */
-}
-
-@font-face {
-  font-family: 'YourCustomHeadingFont'; /* This name matches 'custom-font-heading' in tailwind.config.js */
-  src: url('./fonts/YourCustomHeadingFont-Bold.ttf') format('truetype');
-  font-weight: bold;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* You would typically import Tailwind's base styles here if you're not using a direct link to output.css */
-/* @tailwind base; */
-/* @tailwind components; */
-/* @tailwind utilities; */
