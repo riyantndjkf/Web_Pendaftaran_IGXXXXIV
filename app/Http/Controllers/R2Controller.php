@@ -400,9 +400,11 @@ class R2Controller extends Controller
             'source_team_machine_id' => 'required|exists:tteammachine,id',
             'target_team_machine_id' => 'required|exists:tteammachine,id',
         ]);
-
+        $user = Auth::user();
+        $team = Team::where('nama_tim', $user->name)->firstOrFail();
         try {
             DB::table('tconnectmachine')->insert([
+                'team_id' => $team->id,
                 'source_team_machine_id' => $validated['source_team_machine_id'],
                 'target_team_machine_id' => $validated['target_team_machine_id'],
                 'created_at' => now(),
