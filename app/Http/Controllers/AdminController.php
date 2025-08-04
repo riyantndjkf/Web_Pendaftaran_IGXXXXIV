@@ -46,131 +46,107 @@ public function gantisesi(Request $request)
     // 3. Ambil durasi sesi yang dipilih (dalam menit)
     $durasiSesi = Session::find($request->session_id)->durasi ?? 35;
 
-    // 4. Load config mesin
-    $config = config('machineupgrade');
-
-    // 5. Proses semua tim
+    // 4. Proses semua tim
     $teams = Team::all();
     foreach ($teams as $team) {
-        // --- Reset unlock dan hitung harga maintenance ---
+        // Reset unlock dan hitung harga maintenance
         $teamMachines = TeamMachine::where('team_id', $team->id)->get();
-        
-        // Hitung biaya maintenance berdasarkan event sesi (jika diperlukan)
-        $maintenanceCost = 2500; // Base maintenance cost
-        
+        $maintenanceCost = 2500;
         $totalHargaMaintenance = count($teamMachines) * $maintenanceCost;
 
-        $team->update([
-            'unlocked_babak2' => 0,
-            'harga_unlock' => $totalHargaMaintenance
-        ]);
+        $team->unlocked_babak2 = 0;
+        $team->harga_unlock = $totalHargaMaintenance;
+        $team->save();
 
-        // --- Buat peta mesin dan koneksi ---
-        $machines = $teamMachines->keyBy('id');
-        
-        // Ambil semua koneksi antar mesin untuk tim ini
-        $allConnections = ConnectMachine::all()->toArray();
-        $teamMachineIds = $teamMachines->pluck('id')->toArray();
-        $connections = collect($allConnections)->filter(function ($conn) use ($teamMachineIds) {
-            return in_array($conn['source_team_machine_id'], $teamMachineIds);
-        });
+        // Ambil koneksi mesin dan data mesin
+        $connmachine = DB::table('tconnectmachine as cm')
+            ->join('tteammachine as src', 'cm.source_team_machine_id', '=', 'src.id')
+            ->join('tteammachine as src2', 'cm.target_team_machine_id', '=', 'src2.id')
+            ->join('tmachine as tm_tgt', 'src.tmachine_id', '=', 'tm_tgt.id')
+            ->join('tmachine as tm_tgt2', 'src2.tmachine_id', '=', 'tm_tgt2.id')
+            ->where('cm.team_id', 1)
+            ->select([
+                'cm.id',
+                'src.tmachine_id as source_tmachine_id',
+                'tm_tgt.jenis as source_jenis',
+                'src2.tmachine_id as target_tmachine_id',
+                'tm_tgt2.jenis as target_jenis',
+            ])
+            ->orderBy('cm.id')
+            ->get();
 
-        $graph = [];
-        foreach ($connections as $conn) {
-            $graph[$conn['source_team_machine_id']][] = $conn['target_team_machine_id'];
+        if ($connmachine->isNotEmpty() && $teamMachines->isNotEmpty()) {
+            $productionResult = $this->calculateProductionFlow($connmachine, $teamMachines, $durasiSesi);
+
         }
-
-        // --- DFS: Temukan semua jalur A→B→C→D ---
-        $hasilJalur = [];
-        foreach ($machines as $tm) {
-            if ($tm->jenis_mesin == 1) { // Mulai dari mesin A
-                $this->cariJalur($tm->id, [$tm->id], $graph, $machines, $hasilJalur);
-            }
-        }
-
-        // --- Hitung produksi total ---
-        $produksiTotal = 0;
-        
-        foreach ($hasilJalur as $jalur) {
-            if (count($jalur) !== 4) continue; // Harus lengkap A→B→C→D
-
-            $kapasitas = [];
-            $waktuTotal = 0;
-
-            foreach ($jalur as $id) {
-                $m = $machines[$id];
-                $conf = $config[$m->jenis_mesin];
-                
-                // Ambil kapasitas dan waktu berdasarkan level
-                $kapasitas[] = $conf['capacity_per_level'][$m->level];
-                $waktuTotal += $conf['time_per_level'][$m->level];
-            }
-
-            // Hitung jumlah siklus produksi dalam durasi sesi
-            $jumlahSiklus = floor($durasiSesi / $waktuTotal);
-            
-            // Produksi = siklus × kapasitas minimum
-            $produksi = $jumlahSiklus * min(...$kapasitas);
-            
-            $produksiTotal += $produksi;
-        }
-
-        // --- Ambil sisa uang tim ---
-        $sisaUang = $team->sisa_uang_babak_2 ?? 0;
-        
-        // --- Hitung poin total dari produksi dan uang ---
-        $poinDariProduksi = $produksiTotal; // 1 poin per unit produksi
-        $poinDariUang = floor($sisaUang / 10000); // $10000 = 1 poin
-        $poinTotal = $poinDariProduksi + $poinDariUang;
-
-        // --- Update data tim ---
-        $team->update([
-            'poin_total_babak2' => $poinTotal,
-            'produksi_sesi_ini' => $produksiTotal
-        ]);
-        
-        // --- Log aktivitas sesi (opsional) ---
-        Log::info("Team {$team->id} ", [
-            'produksi_total' => $produksiTotal,
-            'sisa_uang' => $sisaUang,
-            'poin_dari_produksi' => $poinDariProduksi,
-            'poin_dari_uang' => $poinDariUang,
-            'poin_total' => $poinTotal
-        ]);
     }
 
-    return redirect()->back()->with('success', 'Sesi berhasil diperbarui dan poin dihitung ulang!');
+    return redirect()->route('admin.rally-2.index') // Ganti dengan route tujuan
+        ->with('success', 'Sesi berhasil diperbarui dan poin dihitung ulang!');
 }
 
-private function cariJalur($current, $path, $graph, $teamMachines, &$result)
+private function calculateProductionFlow($connmachine, $teamMachines, $durasiSesi)
 {
-    $jenisSekarang = $teamMachines[$current]->jenis_mesin ?? null;
-    
-    \Log::info("DFS - Current machine: {$current}, jenis: {$jenisSekarang}, path: " . implode('→', $path));
+    $hasilProduksi = [];
 
-    // Jika sudah sampai mesin jenis 4, simpan jalur
-    if ($jenisSekarang === 4) {
-        $result[] = $path;
-        \Log::info("DFS - Jalur lengkap ditemukan: " . implode('→', $path));
-        return;
+    foreach ($teamMachines as $tm) {
+        $produksi = floor($durasiSesi / $tm->base_time) * $tm->kapasitas_dasar;
+
+        if (!isset($hasilProduksi[$tm->tmachine_id])) {
+            $hasilProduksi[$tm->tmachine_id] = 0;
+        }
+
+        $hasilProduksi[$tm->tmachine_id] += $produksi;
     }
 
-    // Cari mesin berikutnya yang terhubung
-    $nextMachines = $graph[$current] ?? [];
-    \Log::info("DFS - Next machines dari {$current}: " . implode(', ', $nextMachines));
-    
-    foreach ($nextMachines as $next) {
-        $jenisNext = $teamMachines[$next]->jenis_mesin ?? null;
-        
-        Log::info("DFS - Checking next machine {$next}, jenis: {$jenisNext}, expected: " . ($jenisSekarang + 1));
-        
-        // Pastikan mesin berikutnya adalah jenis yang tepat (1→2→3→4)
-        if ($jenisNext === $jenisSekarang + 1) {
-            Log::info("DFS - Valid connection found: {$current} (jenis {$jenisSekarang}) → {$next} (jenis {$jenisNext})");
-            $this->cariJalur($next, array_merge($path, [$next]), $graph, $teamMachines, $result);
-        } else {
-            Log::warning("DFS - Invalid connection: {$current} (jenis {$jenisSekarang}) → {$next} (jenis {$jenisNext})");
+    // Daftar tmachine_id yang ingin disimpan
+    $filteredIds = [4, 8, 12, 16];
+
+    $output = [];
+    foreach ($hasilProduksi as $tmachine_id => $jumlah) {
+        if (in_array($tmachine_id, $filteredIds)) {
+            $output[] = [
+                'tmachine_id' => $tmachine_id,
+                'jumlah_produksi' => $jumlah,
+                "status" =>false
+            ];
         }
     }
+    
+    foreach ($output as $index => $out) {
+        $mesin_3 = [];
+        $mesin_2 = [];
+        $mesin_1 = [];
+
+        foreach ($connmachine as $conn) {
+            if ($conn->target_tmachine_id == $out['tmachine_id']) {
+                $mesin_3[] = $conn->source_tmachine_id;
+            }
+        }
+
+        foreach ($connmachine as $conn) {
+            if (in_array($conn->target_tmachine_id, $mesin_3)) {
+                $mesin_2[] = $conn->source_tmachine_id;
+            }
+        }
+
+        foreach ($connmachine as $conn) {
+            if (in_array($conn->target_tmachine_id, $mesin_2)) {
+                $mesin_1[] = $conn->source_tmachine_id;
+                $output[$index]['status'] = true;
+                break;
+            }
+        }
+
+        // Optional log/debug
+        Log::info("=== TMID: {$out['tmachine_id']} ===");
+        Log::info("Mesin 3: " . implode(", ", $mesin_3));
+        Log::info("Mesin 2: " . implode(", ", $mesin_2));
+        Log::info("Mesin 1: " . implode(", ", $mesin_1));
+        Log::info("Status: " . ($output[$index]['status'] ? '✅' : '❌'));
+    }
+
+    return $output;
 }
+
 }

@@ -11,5 +11,6 @@ class ConnectMachine extends Model
     protected $fillable = [
         'source_team_machine_id',
         'target_team_machine_id',
+        ""
     ];
 }

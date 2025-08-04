@@ -117,6 +117,10 @@ return new class extends Migration
 
         Schema::create('tconnectmachine', function (Blueprint $table) {
             $table->id();
+
+            // Menyimpan informasi tim
+            $table->foreignId('team_id')->constrained('teams')->onDelete('restrict')->onUpdate('restrict');
+
             $table->unsignedBigInteger('source_team_machine_id');
             $table->unsignedBigInteger('target_team_machine_id');
             $table->timestamps();
@@ -124,8 +128,8 @@ return new class extends Migration
             $table->foreign('source_team_machine_id')->references('id')->on('tteammachine')->onDelete('cascade');
             $table->foreign('target_team_machine_id')->references('id')->on('tteammachine')->onDelete('cascade');
 
-            // UNIQUE agar tidak bisa ada duplikat koneksi
-            $table->unique(['source_team_machine_id', 'target_team_machine_id'], 'conn_source_target_unique');
+            // Pastikan kombinasi unik per tim, supaya satu tim tidak bisa punya koneksi yang sama berkali-kali
+            $table->unique(['team_id', 'source_team_machine_id', 'target_team_machine_id'], 'conn_team_source_target_unique');
         });
 
     }
