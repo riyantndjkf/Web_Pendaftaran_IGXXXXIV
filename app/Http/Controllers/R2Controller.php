@@ -50,7 +50,7 @@ class R2Controller extends Controller
             if ($owned) {
                 $myId = $ownedData->id;
 
-                // Ambil semua koneksi yang melibatkan mesin ini, baik sebagai from atau to
+                
                 $connections = DB::table('tconnectmachine')
                     ->where(function ($q) use ($myId) {
                         $q->where('source_team_machine_id', $myId)
@@ -152,8 +152,134 @@ class R2Controller extends Controller
 
     public function inventory()
     {
-        return view('peserta.rally-2.inventory');
+        $user = Auth::user();
+        $team = Team::where('nama_tim', $user->name)->firstOrFail();
+        $inventory = $team->inventory_babak_2;
+        return view('peserta.rally-2.inventory',compact("inventory"));
     }
+    public function sellItem(Request $request)
+{
+    // Debug 1: Log semua data yang diterima
+    \Log::info('Sell Item Request:', [
+        'all_data' => $request->all(),
+        'quantity' => $request->quantity,
+        'total_price' => $request->total_price,
+        'user_id' => Auth::id(),
+        'user_name' => Auth::user()->name ?? 'No user'
+    ]);
+
+    try {
+        $user = Auth::user();
+        
+        // Debug 2: Cek user
+        if (!$user) {
+            \Log::error('No authenticated user found');
+            return response()->json(['message' => 'User tidak terautentikasi'], 401);
+        }
+
+        \Log::info('User found:', ['user_name' => $user->name]);
+
+        // Debug 3: Cek team
+        $team = Team::where('nama_tim', $user->name)->first();
+        
+        if (!$team) {
+            \Log::error('Team not found for user:', ['user_name' => $user->name]);
+            return response()->json(['message' => 'Tim tidak ditemukan'], 404);
+        }
+
+        \Log::info('Team found:', [
+            'team_id' => $team->id,
+            'team_name' => $team->nama_tim,
+            'current_inventory' => $team->inventory_babak_2,
+            'current_money' => $team->total_uang_babak2
+        ]);
+
+        // Debug 4: Validasi input
+        $quantity = (int) $request->quantity;
+        $totalPrice = (int) $request->total_price;
+
+        if ($quantity <= 0) {
+            return response()->json(['message' => 'Quantity harus lebih dari 0'], 422);
+        }
+
+        if ($totalPrice <= 0) {
+            return response()->json(['message' => 'Total price harus lebih dari 0'], 422);
+        }
+
+        // Debug 5: Validasi stok
+        if ($quantity > $team->inventory_babak_2) {
+            \Log::warning('Insufficient stock:', [
+                'requested' => $quantity,
+                'available' => $team->inventory_babak_2
+            ]);
+            return response()->json(['message' => 'Jumlah melebihi stok yang tersedia!'], 422);
+        }
+
+        // Debug 6: Data sebelum update
+        $oldInventory = $team->inventory_babak_2;
+        $oldMoney = $team->total_uang_babak2;
+
+        \Log::info('Before update:', [
+            'old_inventory' => $oldInventory,
+            'old_money' => $oldMoney
+        ]);
+
+        // Update dengan tracking perubahan
+        $team->inventory_babak_2 = $oldInventory - $quantity;
+        $team->total_uang_babak2 = $oldMoney + $totalPrice;
+
+        // Debug 7: Cek apakah model dirty (ada perubahan)
+        \Log::info('Model changes:', [
+            'is_dirty' => $team->isDirty(),
+            'dirty_attributes' => $team->getDirty(),
+            'new_inventory' => $team->inventory_babak_2,
+            'new_money' => $team->total_uang_babak2
+        ]);
+
+        // Save dengan error handling
+        $saved = $team->save();
+
+        \Log::info('Save result:', [
+            'saved' => $saved,
+            'final_inventory' => $team->fresh()->inventory_babak_2,
+            'final_money' => $team->fresh()->total_uang_babak2
+        ]);
+
+        if (!$saved) {
+            \Log::error('Failed to save team data');
+            return response()->json(['message' => 'Gagal menyimpan data'], 500);
+        }
+
+        // Refresh data dari database
+        $team->refresh();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Berhasil menjual item!',
+            'inventory' => $team->inventory_babak_2,
+            'uang' => $team->total_uang_babak2,
+            'debug' => [
+                'quantity_sold' => $quantity,
+                'price_earned' => $totalPrice,
+                'old_inventory' => $oldInventory,
+                'old_money' => $oldMoney
+            ]
+        ], 200);
+
+    } catch (\Exception $e) {
+        \Log::error('Exception in sellItem:', [
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => $e->getTraceAsString()
+        ]);
+
+        return response()->json([
+            'message' => 'Terjadi kesalahan sistem',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
 
     public function question()
     {

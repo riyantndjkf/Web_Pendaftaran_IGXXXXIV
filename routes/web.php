@@ -113,6 +113,8 @@ Route::group([
     Route::get('/rally2/scanner', [R2Controller::class, 'scanner'])->name('rally-2.scanner');
     Route::get('/rally2/events', [R2Controller::class, 'events'])->name('rally-2.events');
     Route::get('/rally2/inventory', [R2Controller::class, 'inventory'])->name('rally-2.inventory');
+    Route::post('/rally2/sellsepeda', [R2Controller::class, 'sellItem'])->name('rally-2.sellsepeda');
+
 
     //==================SCANNER==========================
     Route::get('/rally2/question/{id}', [R2Controller::class, 'showQR'])

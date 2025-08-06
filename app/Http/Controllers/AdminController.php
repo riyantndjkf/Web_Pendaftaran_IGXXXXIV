@@ -44,7 +44,9 @@ public function gantisesi(Request $request)
     Session::where('id', $request->session_id)->update(['jenis_sesi' => 1]);
 
     // 3. Ambil durasi sesi yang dipilih (dalam menit)
-    $durasiSesi = Session::find($request->session_id)->durasi ?? 35;
+    $sesi = $request->session_id - 1;
+    $durasiSesi = Session::find($sesi)->durasi ?? 35;
+    $demand = Session::find($sesi)->demand ?? 30;
 
     // 4. Proses semua tim
     $teams = Team::all();
@@ -55,8 +57,14 @@ public function gantisesi(Request $request)
         $totalHargaMaintenance = count($teamMachines) * $maintenanceCost;
 
         $team->unlocked_babak2 = 0;
-        $team->harga_unlock = $totalHargaMaintenance;
-        $team->save();
+        if($sesi == 3 || $sesi == "3"){
+            $team->harga_unlock = $totalHargaMaintenance * 1.5;
+        }
+        else{
+            $team->harga_unlock = $totalHargaMaintenance;
+        }
+        
+        
 
         // Ambil koneksi mesin dan data mesin
         $connmachine = DB::table('tconnectmachine as cm')
@@ -77,6 +85,40 @@ public function gantisesi(Request $request)
 
         if ($connmachine->isNotEmpty() && $teamMachines->isNotEmpty()) {
             $productionResult = $this->calculateProductionFlow($connmachine, $teamMachines, $durasiSesi);
+            $totalProduk = 0;
+            foreach ($productionResult as $result) {
+                if ($result['status'] === true) {
+                    $totalProduk += $result['jumlah_produksi'];
+                }
+            }
+            Log::info($totalProduk);   
+            Log::info($demand);   
+
+            if($totalProduk > $demand){
+                $totalProduk -= $demand;
+                $team->inventory_babak_2 = $totalProduk;
+                $uang = $team->total_uang_babak2;
+                $poin = floor($uang / 10000);
+                if($sesi == 2 || $sesi = "2"){
+                    $team->poin_total_babak2 += ($demand + $poin) * 1.5;
+                }
+                else{
+                    $team->poin_total_babak2 += $demand + $poin;
+                }
+                
+            }
+            else{
+                $uang = $team->total_uang_babak2;
+                $poin = floor($uang / 10000);
+                if($sesi == 2 || $sesi = "2"){
+                    $team->poin_total_babak2 += ($totalProduk + $poin) * 1.5;
+                }
+                else{
+                   $team->poin_total_babak2 += $totalProduk + $poin;
+                }
+                
+            }
+            $team->save();
 
         }
     }
