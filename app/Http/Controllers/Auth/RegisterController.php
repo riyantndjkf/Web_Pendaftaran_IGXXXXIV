@@ -3,117 +3,103 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Komponen;
-use App\Models\PoinBabak1;
-use App\Models\Sepeda;
+use App\Models\Member;
 use App\Models\Team;
-use App\Models\Tteam;
-use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
-use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
-use App\Models\User;
-use Psy\Readline\Hoa\Console;
+use Illuminate\Validation\ValidationException;
+use Throwable;
 
 class RegisterController extends Controller
 {
-    use RegistersUsers;
-
-    protected $redirectTo = '/home';
-
-    public function __construct()
-    {
-        $this->middleware('guest');
-    }
-
     public function showRegistrationForm()
     {
-        return view('auth.register'); 
+        return view('auth.register_single_form');
     }
 
-    public function register(Request $request)
+    public function store(Request $request)
     {
-        // 1. VALIDASI DATA: TAMBAHKAN 'asal_sekolah'
-        $validator = Validator::make($request->all(), [
+        // 1. Validasi Input Dasar
+        $request->validate([
             'nama_tim' => ['required', 'string', 'max:255', 'unique:teams,nama_tim'],
-            'password' => ['required', 'string', 'min:8'],
-            'asal_sekolah' => ['required', 'string', 'max:255'], // <-- TAMBAHAN
-            'members' => ['required', 'array', 'size:3'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'asal_sekolah' => ['required', 'string', 'max:255'],
             'members.*.nama_lengkap' => ['required', 'string', 'max:255'],
-            'members.*.email' => ['required', 'email', 'distinct', 'unique:members,email'],
-            'members.*.kartu_pelajar' => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'members.*.email' => ['required', 'string', 'email', 'max:255', 'distinct', 'unique:members,email'],
+            'members.*.kontak' => ['required', 'string', 'max:20'],
+            'members.*.path_foto_ktm' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+            'foto_bukti_pembayaran' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+        ], [
+            'nama_tim.unique' => 'Nama tim ini sudah terdaftar.',
+            'members.*.email.unique' => 'Email anggota ini sudah digunakan.',
+            'members.*.email.distinct' => 'Setiap anggota harus memiliki email yang berbeda.',
         ]);
 
-        if ($validator->fails()) {
-            return redirect('register')->withErrors($validator)->withInput();
-        }
-
-        DB::beginTransaction();
         try {
-            // 2. BUAT TEAM: TAMBAHKAN 'asal_sekolah'
-            $team = Team::create([
-                'nama_tim' => $request->nama_tim,
-                'password' => $request->password,
-                'asal_sekolah' => $request->asal_sekolah, 
-                'foto_bukti_pembayaran' => ""
-            ]);
-            User::create([
-                'name' => $request->nama_tim,
-                'role' => 'peserta',
-                'password' => bcrypt($request->password),
-            ]);
+            // 2. Gunakan Transaksi Database
+            // Ini memastikan semua proses (buat tim, buat anggota, upload file) berhasil,
+            // atau semuanya akan dibatalkan (rollback) jika ada satu saja yang gagal.
+            $team = DB::transaction(function () use ($request) {
 
-            
-            Komponen::create([
-                'team_id' => $team->id,
-            ]);
+                // 3. Penanganan Upload File Bukti Pembayaran
+                try {
+                    $buktiPembayaranPath = $request->file('foto_bukti_pembayaran')->store('bukti_pembayaran', 'public');
+                } catch (Throwable $e) {
+                    // Log error untuk investigasi admin
+                    Log::error('File Upload Failed: ' . $e->getMessage());
+                    // Kirim pesan error yang jelas ke pengguna
+                    throw ValidationException::withMessages([
+                        'foto_bukti_pembayaran' => 'Gagal mengunggah bukti pembayaran. Silakan coba lagi.'
+                    ]);
+                }
 
-            Sepeda::create([
-                'team_id' => $team->id,
-            ]);
-
-            PoinBabak1::create([
-                'sepeda_komponen_peserta_namaTim1' => $team->id,
-                'total_poin' => 0,
-            ]);
-
-
-            // Logika untuk anggota tetap sama
-            foreach ($request->members as $index => $memberData) {
-                $file = $memberData['kartu_pelajar'];
-                $namaTimSlug = Str::slug($request->nama_tim);
-                $fileName = "{$namaTimSlug}_" . ($index + 1) . ".{$file->getClientOriginalExtension()}";
-                $path = $file->storeAs('public/kartu_pelajar', $fileName);
-
-                $team->members()->create([
-                    'status' => ($index == 0) ? 'ketua' : 'anggota',
-                    'nama_lengkap' => $memberData['nama_lengkap'],
-                    'alamat' => $memberData['alamat'],
-                    'nomor_telepon' => $memberData['nomor_telepon'],
-                    'email' => $memberData['email'],
-                    'riwayat_penyakit' => $memberData['riwayat_penyakit'] ?? '-',
-                    'alergi' => $memberData['alergi'] ?? '-',
-                    'path_kartu_pelajar' => $path,
+                // Membuat tim baru
+                $newTeam = Team::create([
+                    'nama_tim' => $request->nama_tim,
+                    'password' => bcrypt($request->password),
+                    'asal_sekolah' => $request->asal_sekolah,
+                    'foto_bukti_pembayaran' => $buktiPembayaranPath,
+                    // Tambahkan field lain jika ada
                 ]);
-            }
 
-            DB::commit();
-            event(new Registered($team));
-            
-           return redirect()->route('register.success');
+                // Membuat anggota tim
+                foreach ($request->members as $memberData) {
+                    try {
+                        $ktmPath = $memberData['path_foto_ktm']->store('ktm', 'public');
+                    } catch (Throwable $e) {
+                        Log::error('KTM Upload Failed: ' . $e->getMessage());
+                        throw ValidationException::withMessages([
+                            'members.0.path_foto_ktm' => 'Gagal mengunggah salah satu file KTM. Pastikan semua file valid.'
+                        ]);
+                    }
 
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            Log::error('Registrasi Gagal: ' . $th->getMessage());
-            return redirect('register')->with('error', 'Terjadi kesalahan saat registrasi, silakan coba lagi.')->withInput();
+                    $newTeam->members()->create([
+                        'nama_lengkap' => $memberData['nama_lengkap'],
+                        'email' => $memberData['email'],
+                        'kontak' => $memberData['kontak'],
+                        'path_foto_ktm' => $ktmPath,
+                    ]);
+                }
+                
+                return $newTeam;
+            });
+
+            // 4. Proses setelah berhasil
+            // (Opsional: Login otomatis atau kirim email notifikasi)
+            // auth()->login($team->user); // Jika ada relasi ke user
+
+            return redirect()->route('home')->with('success', 'Pendaftaran tim ' . $team->nama_tim . ' berhasil!');
+
+        } catch (ValidationException $e) {
+            // Jika ada error validasi dari dalam transaksi, lempar kembali
+            throw $e;
+        } catch (Throwable $e) {
+            // 5. Menangkap semua error lain yang mungkin terjadi
+            Log::error('Registration Error: ' . $e->getMessage());
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan tak terduga saat pendaftaran. Silakan hubungi panitia jika masalah berlanjut.');
         }
     }
-    
-    // Method validator() dan create() di bawah ini tidak terpakai oleh alur kita.
-    protected function validator(array $data){/*...*/}
-    protected function create(array $data){/*...*/}
 }

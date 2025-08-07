@@ -2,106 +2,102 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Team;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
-use App\Models\User;
+use Illuminate\Support\Arr;
+use Illuminate\Validation\ValidationException;
+use Throwable;
+
 class BundleRegistrationController extends Controller
 {
-    /**
-     * Menampilkan formulir registrasi multi-langkah untuk paket bundle.
-     */
-    public function create()
+    public function showRegistrationForm()
     {
         return view('auth.register_bundle_form');
     }
 
-    /**
-     * Menyimpan data dari formulir registrasi bundle.
-     */
     public function store(Request $request)
     {
-        // 1. Validasi semua data yang masuk, termasuk bukti pembayaran
-        $validator = Validator::make($request->all(), [
+        // 1. Validasi Input Dasar
+        $request->validate([
             'asal_sekolah' => ['required', 'string', 'max:255'],
-            'foto_bukti_pembayaran' => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:2048'], // Validasi bukti bayar
-            
-            'teams'               => ['required', 'array', 'size:3'],
-            'teams.*.nama_tim'    => ['required', 'string', 'distinct', 'unique:teams,nama_tim'],
-            'teams.*.password'    => ['required', 'string', 'min:8'],
-            
-            'teams.*.members'                 => ['required', 'array', 'size:3'],
-            'teams.*.members.*.nama_lengkap'  => ['required', 'string', 'max:255'],
-            'teams.*.members.*.alamat'        => ['required', 'string'],
-            'teams.*.members.*.nomor_telepon' => ['required', 'string', 'max:20'],
-            'teams.*.members.*.email'         => ['required', 'email', 'distinct', 'unique:members,email'],
-            'teams.*.members.*.kartu_pelajar' => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'foto_bukti_pembayaran' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+            'teams' => ['required', 'array', 'size:3'],
+            'teams.*.nama_tim' => ['required', 'string', 'max:255', 'distinct', 'unique:teams,nama_tim'],
+            'teams.*.password' => ['required', 'string', 'min:8'],
+            'teams.*.members' => ['required', 'array', 'size:3'],
+            'teams.*.members.*.nama_lengkap' => ['required', 'string', 'max:255'],
+            'teams.*.members.*.email' => ['required', 'string', 'email', 'max:255', 'distinct', 'unique:members,email'],
+            'teams.*.members.*.kontak' => ['required', 'string', 'max:20'],
+            'teams.*.members.*.path_foto_ktm' => ['required', 'file', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
+        ], [
+            'teams.*.nama_tim.distinct' => 'Nama tim dalam satu pendaftaran bundle tidak boleh sama.',
+            'teams.*.nama_tim.unique' => 'Salah satu nama tim sudah terdaftar.',
+            'teams.*.members.*.email.distinct' => 'Email setiap anggota di semua tim harus unik.',
+            'teams.*.members.*.email.unique' => 'Salah satu email anggota sudah digunakan.',
         ]);
 
-        if ($validator->fails()) {
-            return back()->withErrors($validator)->withInput();
+        // 2. Pengecekan Duplikasi Email Antar Tim dalam Request yang Sama
+        $allMemberEmails = Arr::flatten(Arr::pluck($request->teams, 'members.*.email'));
+        if (count($allMemberEmails) !== count(array_unique($allMemberEmails))) {
+            throw ValidationException::withMessages([
+                'teams.0.members.0.email' => 'Terdapat duplikasi email anggota di antara tim yang Anda daftarkan. Harap gunakan email yang berbeda untuk setiap anggota.'
+            ]);
         }
 
-        DB::beginTransaction();
         try {
-            // 2. Simpan file bukti pembayaran terlebih dahulu
-            $buktiPembayaranFile = $request->file('foto_bukti_pembayaran');
-            $namaSekolahSlug = Str::slug($request->asal_sekolah);
-            $pathBuktiPembayaran = $buktiPembayaranFile->storeAs(
-                'public/bukti_pembayaran',
-                "{$namaSekolahSlug}_" . time() . ".{$buktiPembayaranFile->getClientOriginalExtension()}"
-            );
+            // 3. Gunakan Transaksi Database
+            DB::transaction(function () use ($request) {
 
-            // 3. Lakukan perulangan untuk setiap tim dari formulir
-            foreach ($request->teams as $teamKey => $teamData) {
-                // Siapkan data untuk membuat tim
-                $teamCreateData = [
-                    'nama_tim' => $teamData['nama_tim'],
-                    'password' => $teamData['password'],
-                    'asal_sekolah' => $request->asal_sekolah,
-                ];
-
-                // 4. HANYA untuk tim pertama, tambahkan path bukti pembayaran
-                if ($teamKey == 0) {
-                    $teamCreateData['foto_bukti_pembayaran'] = $pathBuktiPembayaran;
+                // Penanganan Upload File Bukti Pembayaran
+                try {
+                    $buktiPembayaranPath = $request->file('foto_bukti_pembayaran')->store('bukti_pembayaran', 'public');
+                } catch (Throwable $e) {
+                    Log::error('File Upload Failed: ' . $e->getMessage());
+                    throw ValidationException::withMessages(['foto_bukti_pembayaran' => 'Gagal mengunggah bukti pembayaran. Silakan coba lagi.']);
                 }
 
-                $team = Team::create($teamCreateData);
-                User::create([
-                    'name' => $teamData['nama_tim'],
-                    'role' => 'peserta',
-                    'password' => bcrypt($teamData['password']),
-                ]);
-                // 5. Proses anggota tim seperti biasa
-                foreach ($teamData['members'] as $memberKey => $memberData) {
-                    $file = $memberData['kartu_pelajar'];
-                    $namaTimSlug = Str::slug($teamData['nama_tim']);
-                    $fileName = "{$namaTimSlug}_member_" . ($memberKey + 1) . "_" . time() . ".{$file->getClientOriginalExtension()}";
-                    $path = $file->storeAs('public/kartu_pelajar', $fileName);
-
-                    $team->members()->create([
-                        'status' => ($memberKey == 0) ? 'ketua' : 'anggota',
-                        'nama_lengkap' => $memberData['nama_lengkap'],
-                        'alamat' => $memberData['alamat'],
-                        'nomor_telepon' => $memberData['nomor_telepon'],
-                        'email' => $memberData['email'],
-                        'riwayat_penyakit' => $memberData['riwayat_penyakit'] ?? '-',
-                        'alergi' => $memberData['alergi'] ?? '-',
-                        'path_kartu_pelajar' => $path,
+                // Looping untuk setiap tim dalam bundle
+                foreach ($request->teams as $teamIndex => $teamData) {
+                    $newTeam = Team::create([
+                        'nama_tim' => $teamData['nama_tim'],
+                        'password' => bcrypt($teamData['password']),
+                        'asal_sekolah' => $request->asal_sekolah,
+                        'foto_bukti_pembayaran' => $buktiPembayaranPath,
+                        // Tambahkan field lain jika ada
                     ]);
+
+                    // Looping untuk setiap anggota dalam tim
+                    foreach ($teamData['members'] as $memberIndex => $memberData) {
+                        try {
+                            $ktmPath = $memberData['path_foto_ktm']->store('ktm', 'public');
+                        } catch (Throwable $e) {
+                            Log::error('KTM Upload Failed: ' . $e->getMessage());
+                            throw ValidationException::withMessages([
+                                "teams.{$teamIndex}.members.{$memberIndex}.path_foto_ktm" => "Gagal mengunggah KTM untuk anggota di Tim " . ($teamIndex + 1)
+                            ]);
+                        }
+
+                        $newTeam->members()->create([
+                            'nama_lengkap' => $memberData['nama_lengkap'],
+                            'email' => $memberData['email'],
+                            'kontak' => $memberData['kontak'],
+                            'path_foto_ktm' => $ktmPath,
+                        ]);
+                    }
                 }
-            }
+            });
 
-            DB::commit();
-            return redirect()->route('register')->with('success', 'Registrasi bundle berhasil!');
+            return redirect()->route('home')->with('success', 'Pendaftaran 3 tim berhasil!');
 
-        } catch (\Throwable $th) {
-            DB::rollBack();
-            Log::error('Registrasi Bundle Gagal: ' . $th->getMessage());
-            return back()->with('error', 'Terjadi kesalahan pada server. Silakan coba lagi.');
+        } catch (ValidationException $e) {
+            throw $e;
+        } catch (Throwable $e) {
+            Log::error('Bundle Registration Error: ' . $e->getMessage());
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan tak terduga saat pendaftaran. Silakan hubungi panitia jika masalah berlanjut.');
         }
     }
 }
