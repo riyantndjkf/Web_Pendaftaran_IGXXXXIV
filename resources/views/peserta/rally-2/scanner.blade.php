@@ -13,6 +13,13 @@
         </button>
     </div>
 
+    {{-- Pesan Error --}}
+    @if(session('error'))
+        <div class="bg-red-100 text-red-800 p-3 rounded m-4 text-center">
+            {{ session('error') }}
+        </div>
+    @endif
+    
     <div class="p-4 text-center">
         <h1 class="text-[50px] font-bold text-black">SCAN QR</h1>
         <div id="qr-reader-container" class="relative overflow-hidden mx-auto"

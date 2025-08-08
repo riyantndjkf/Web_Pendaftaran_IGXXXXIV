@@ -367,15 +367,13 @@ class R2Controller extends Controller
             return redirect()
                 ->route('peserta.rally-2.scanner') // ganti ini dengan rute tempat peserta diarahkan kembali
                 ->with('error', 'Envelope ini sudah diklaim oleh tim lain.');
+        } else {
+            $envelope->team_id = $team->id;
+            $envelope->save();
+
+            $team->total_uang_babak2 += $envelope->reward_amount;
+            $team->save();
         }
-
-         // Tinggal update ID Team yang klaim
-        // $envelope->team_id =
-
-        $team->total_uang_babak2 += $envelope->reward_amount;
-        $team->save();
-        
-        // Simpan ke log atau tandai sebagai sudah diklaim (opsional)
 
         // Kirim tampilan reward
         return view('peserta.rally-2.claim-envelope', compact('envelope'));

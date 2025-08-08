@@ -9,6 +9,19 @@
                 <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6 rounded-lg text-center font-semibold">
                     ⚠️ Kamu sudah pernah mengakses soal ini sebelumnya.
                 </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        document.getElementById('submitBtn').disabled = true;
+
+                        // Sekalian disable semua tombol opsi
+                        document.querySelectorAll('.option-btn').forEach(btn => {
+                            btn.disabled = true;
+                        });
+
+                        // Jika ada input manual, disable juga
+                        document.getElementById('jawabanInput')?.setAttribute('disabled', true);
+                    });
+                </script>
             @endif
 
             <div class="text-left mb-6">
@@ -28,27 +41,27 @@
 
             <div class="flex flex-col gap-4 mt-4">
                 @if ($soal->option_1)
-                    <button class="w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this);">
+                    <button class="option-btn w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this);">
                         <span class="text-lg font-medium text-black">{{ $soal->option_1 }}</span>
                     </button>
 
-                    <button class="w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this);">
+                    <button class="option-btn w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this);">
                         <span class="text-lg font-medium text-black">{{ $soal->option_2 }}</span>
                     </button>
                 
-                    <button class="w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this);">
+                    <button class="option-btn w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this);">
                         <span class="text-lg font-medium text-black">{{ $soal->option_3 }}</span>
                     </button>
 
-                    <button class="w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this);">
+                    <button class="option-btn w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this);">
                         <span class="text-lg font-medium text-black">{{ $soal->option_4 }}</span>
                     </button>
                 @elseif ($soal->jawaban_benar === 'TRUE' || $soal->jawaban_benar === 'FALSE')
-                    <button class="w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this);">
+                    <button class="option-btn w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this);">
                         <span class="text-lg font-medium text-black">TRUE</span>
                     </button>
 
-                    <button class="w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this);">
+                    <button class="option-btn w-full p-4 text-left bg-gray-100 rounded-lg border-2" onclick="selectOption(this);">
                         <span class="text-lg font-medium text-black">FALSE</span>
                     </button>
                 @else
