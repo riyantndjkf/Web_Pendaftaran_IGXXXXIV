@@ -38,10 +38,22 @@
     </div>
 </section>
 
-<section class="bg-[#14191A] py-16 flex flex-col justify-center items-center text-center px-4" style="background-image: url('{{ asset('images/Background_Prizes.png') }}'); background-size: cover; background-position: center;">
-    <img src="{{ asset('images/Prizes_Tulisan.png') }}" alt="Prizes" class="mx-auto h-16 sm:h-24 md:h-32 mb-10">
+<section 
+    class="bg-[#14191A] pt-16 pb-0 flex flex-col justify-center items-center text-center px-4" 
+    style="background-image: url('{{ asset('images/Background_Prizes.png') }}'); background-size: cover; background-position: center;"
+>
+    <img 
+        src="{{ asset('images/Prizes_Tulisan.png') }}" 
+        alt="Prizes" 
+        class="mx-auto h-16 sm:h-24 md:h-32 mb-10"
+    >
     
-    {{-- Gambar hadiah dijadikan elemen <img> agar tidak terpotong --}}
-    <img src="{{ asset('images/Prizes.png') }}" alt="Prizes Content" class="w-full max-w-4xl h-auto object-contain">
+    <div class="w-screen overflow-x-auto whitespace-nowrap">
+        <img 
+            src="{{ asset('images/Prizes.png') }}" 
+            alt="Prizes Content" 
+            class="h-auto inline-block min-w-full"
+        >
+    </div>
 </section>
 @endsection
