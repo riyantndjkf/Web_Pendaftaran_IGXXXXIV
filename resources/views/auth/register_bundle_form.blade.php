@@ -4,7 +4,7 @@
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Pirata+One&display=swap');
 
-   body {
+    body {
         background-color: #0c0c0c;
         color: white;
         background-image: url('{{ asset('images/Background_BundleRegistration.png') }}');
@@ -12,7 +12,6 @@
         background-size: cover;
         background-position: top center;
     }
-
     .form-container {
         background-color: rgba(255, 255, 255, 0.35);
         border-radius: 1rem;
@@ -20,7 +19,6 @@
         padding: 2rem;
         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
     }
-
     .form-input {
         background-color: rgba(255, 255, 255, 0.35);
         border: none;
@@ -29,22 +27,13 @@
         color: white;
         width: 100%;
     }
-
-    .form-input::placeholder {
-        color: rgba(255, 255, 255, 0.7);
-    }
-
+    .form-input::placeholder { color: rgba(255, 255, 255, 0.7); }
     .form-input:focus {
         outline: none;
         border: 1px solid white;
         background-color: rgba(255, 255, 255, 0.3);
     }
-
-    .form-label {
-        font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
-
+    .form-label { font-weight: 600; margin-bottom: 0.5rem; }
     .btn-primary {
         background-color: rgba(255, 255, 255, 0.1);
         color: white;
@@ -59,32 +48,16 @@
         text-transform: uppercase;
         transition: all 0.3s ease;
     }
-
     .btn-primary:hover {
         background-color: rgba(255, 255, 255, 0.2);
         transform: translateY(-2px);
     }
-
-    .section-title {
-        font-family: 'Pirata One', cursive;
-        font-size: 3rem;
-        margin-bottom: 1rem;
-    }
-.font-pirata {
-    font-family: 'Pirata One', cursive;
-}
-
-.font-firlest {
-    font-family: 'Firlest', serif;
-}
+    .section-title { font-family: 'Pirata One', cursive; font-size: 3rem; margin-bottom: 1rem; }
+    .font-pirata { font-family: 'Pirata One', cursive; }
+    .font-firlest { font-family: 'Firlest', serif; }
     @media (max-width: 768px) {
-        .form-container {
-            padding: 1rem;
-        }
-
-        .section-title {
-            font-size: 2rem;
-        }
+        .form-container { padding: 1rem; }
+        .section-title { font-size: 2rem; }
     }
 </style>
 
@@ -105,26 +78,82 @@
             </div>
         @endif
 
-        <div class="form-container">
-            <h2 class="text-4xl font-pirata text-white text-center mb-4">ASAL SEKOLAH</h2>
-            <input type="text" name="asal_sekolah" placeholder="Asal Sekolah" value="{{ old('asal_sekolah') }}" class="form-input" required>
-        </div>
-
-        @for ($i = 0; $i < 3; $i++)
-            <div class="form-container">
-                <h2 class="text-lg font-bold text-white mb-4">DATA TIM {{ $i + 1 }}</h2>
-                @include('auth.partials.team_form', ['team_index' => $i])
+        <div id="step-1" class="form-step">
+            <div class="form-container mb-12">
+                <h2 class="text-4xl font-pirata text-white text-center mb-4">ASAL SEKOLAH</h2>
+                <input type="text" name="asal_sekolah" placeholder="Asal Sekolah" value="{{ old('asal_sekolah') }}" class="form-input" required>
             </div>
-        @endfor
-
-        <div class="form-container">
-            <label class="form-label block text-white">Upload Bukti Pembayaran</label>
-            <input type="file" name="foto_bukti_pembayaran" class="form-input" required>
+            <div class="form-container">
+                <h2 class="text-3xl font-bold text-white mb-4 text-center font-pirata">DATA TIM 1</h2>
+                {{-- Memanggil partial form untuk tim pertama (index 0) --}}
+                @include('auth.partials.team_form', ['team_index' => 0])
+            </div>
         </div>
 
-        <div class="flex justify-center">
-            <button type="submit" class="btn-primary ">Daftarkan Semua Tim</button>
+        <div id="step-2" class="form-step hidden">
+            <div class="form-container">
+                <h2 class="text-3xl font-bold text-white mb-4 text-center font-pirata">DATA TIM 2</h2>
+                {{-- Memanggil partial form untuk tim kedua (index 1) --}}
+                @include('auth.partials.team_form', ['team_index' => 1])
+            </div>
+        </div>
+
+        <div id="step-3" class="form-step hidden">
+            <div class="form-container">
+                <h2 class="text-3xl font-bold text-white mb-4 text-center font-pirata">DATA TIM 3</h2>
+                {{-- Memanggil partial form untuk tim ketiga (index 2) --}}
+                @include('auth.partials.team_form', ['team_index' => 2])
+            </div>
+
+            <div class="form-container mt-12">
+                <label class="form-label block text-white text-2xl font-pirata text-center">UPLOAD BUKTI PEMBAYARAN</label>
+                <input type="file" name="foto_bukti_pembayaran" class="form-input" required>
+            </div>
+        </div>
+
+
+        <div class="mt-8 flex justify-between">
+            <button type="button" id="prev-btn" class="btn-primary hidden">Previous</button>
+            <button type="button" id="next-btn" class="btn-primary ml-auto">Next</button>
+            <button type="submit" id="submit-btn" class="btn-primary hidden ml-auto">Daftarkan Semua Tim</button>
         </div>
     </form>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const steps = document.querySelectorAll('.form-step');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        let currentStep = 0;
+
+        function showStep(stepIndex) {
+            steps.forEach((step, index) => {
+                step.classList.toggle('hidden', index !== stepIndex);
+            });
+
+            prevBtn.classList.toggle('hidden', stepIndex === 0);
+            nextBtn.classList.toggle('hidden', stepIndex === steps.length - 1);
+            submitBtn.classList.toggle('hidden', stepIndex !== steps.length - 1);
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentStep > 0) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        });
+
+        // Initialize the form
+        showStep(currentStep);
+    });
+</script>
 @endsection
