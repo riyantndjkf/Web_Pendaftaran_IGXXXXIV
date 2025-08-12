@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\BundleRegistrationController;
 
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -21,6 +22,10 @@ use App\Http\Controllers\BundleRegistrationController;
 | Ini adalah file rute final Anda.
 |
 */
+
+Route::get('/AdminRegis', [AdminController::class, 'registrationDashboard'])->name('admin.regis.dashboard');
+Route::post('/AdminRegis/verify/{team}', [AdminController::class, 'verifyPayment'])->name('admin.regis.verify');
+Route::post('/AdminRegis/unverify/{team}', [AdminController::class, 'unverifyPayment'])->name('admin.regis.unverify');
 
 // --- RUTE HALAMAN UTAMA & STATIS ---
 Route::get('/', function () {

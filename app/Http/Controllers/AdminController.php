@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Session;
 use App\Models\Team;
 use App\Models\TeamMachine;
+use Illuminate\Support\Facades\Storage; 
+
 
 use App\Models\ConnectMachine;
 use DB;
@@ -189,6 +191,31 @@ private function calculateProductionFlow($connmachine, $teamMachines, $durasiSes
     }
 
     return $output;
+}
+
+public function registrationDashboard()
+{
+    // Ambil semua tim beserta data anggotanya, urutkan dari yang terbaru
+    $teams = Team::with('members')->orderBy('created_at', 'desc')->get();
+    
+    // Tampilkan view baru dengan membawa data tim
+    return view('admin.registration_dashboard', compact('teams'));
+}
+
+public function verifyPayment(Team $team)
+{
+    // Ubah status verifikasi menjadi true (terverifikasi)
+    $team->update(['ver_bukti_bayar' => true]);
+    
+    return redirect()->route('admin.regis.dashboard')->with('success', 'Tim ' . $team->nama_tim . ' berhasil diverifikasi.');
+}
+
+public function unverifyPayment(Team $team)
+{
+    // Ubah status verifikasi menjadi false (belum terverifikasi)
+    $team->update(['ver_bukti_bayar' => false]);
+
+    return redirect()->route('admin.regis.dashboard')->with('success', 'Status verifikasi tim ' . $team->nama_tim . ' berhasil diubah menjadi Unverified.');
 }
 
 }

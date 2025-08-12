@@ -40,11 +40,19 @@ class HomeController extends Controller
         }
 
     public function account()
+{
+    $user = Auth::user();
+
+    $team = Team::with('members')->where('nama_tim', $user->name)->first();
+
+    return view('peserta.account', [
+        'team' => $team
+    ]);
+}
+
+    public function logout(Request $request)
     {
-        $user = Auth::user();        
-        $team = Team::with('members')->find($user->id);
-        return view('peserta.account', [
-            'team' => $team
-        ]);
+        Auth::logout();
+        return redirect('/login');
     }
 }

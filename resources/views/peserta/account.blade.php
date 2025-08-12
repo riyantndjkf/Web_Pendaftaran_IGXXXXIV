@@ -56,18 +56,18 @@
                 <!-- Status Pembayaran -->
                 <div class="bg-gray-700 p-4 rounded-md shadow-inner">
                     <p class="text-gray-300 text-lg">Status Pembayaran:</p>
-                    {{-- Menyesuaikan warna teks berdasarkan status pembayaran 
-                     @if ($team->ver_bukti_bayar)
-                        <p class="text-green-400 text-2xl font-bold">Sudah Bayar</p>
-                    @else
-                        <p class="text-red-400 text-2xl font-bold">Belum Bayar</p>
-                    @endif--}}
+                 {{-- Menyesuaikan warna teks berdasarkan status pembayaran --}}
+                @if ($team && $team->ver_bukti_bayar)
+                    <p class="text-green-400 text-2xl font-bold">Verified</p>
+                @else
+                    <p class="text-yellow-400 text-2xl font-bold">Unverified</p>
+                @endif
                 </div>
             </div>
 
             <div class="mt-10">
-                <a href="{{ route('peserta.home') }}" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-8 rounded-full text-lg transition duration-300 shadow-lg hover:shadow-xl">
-                    Kembali ke Dashboard
+                 <a href="{{ url('/') }}" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-8 rounded-full text-lg transition duration-300 shadow-lg hover:shadow-xl">
+                    Kembali ke Home
                 </a>
             </div>
             <form method="POST" action="{{ route('logout') }}">

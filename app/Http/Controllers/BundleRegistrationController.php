@@ -51,8 +51,9 @@ class BundleRegistrationController extends Controller
             $buktiPembayaranFile = $request->file('foto_bukti_pembayaran');
             $namaSekolahSlug = Str::slug($request->asal_sekolah);
             $pathBuktiPembayaran = $buktiPembayaranFile->storeAs(
-                'public/bukti_pembayaran',
-                "{$namaSekolahSlug}_" . time() . ".{$buktiPembayaranFile->getClientOriginalExtension()}"
+            'bukti_pembayaran',
+            "{$namaSekolahSlug}_" . time() . ".{$buktiPembayaranFile->getClientOriginalExtension()}",
+            'public'
             );
 
             // 3. Lakukan perulangan untuk setiap tim dari formulir

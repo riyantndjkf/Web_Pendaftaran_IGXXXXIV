@@ -41,26 +41,35 @@ class RegisterController extends Controller
         $validator = Validator::make($request->all(), [
             'nama_tim' => ['required', 'string', 'max:255', 'unique:teams,nama_tim'],
             'password' => ['required', 'string', 'min:8'],
-            'asal_sekolah' => ['required', 'string', 'max:255'], // <-- TAMBAHAN
+            'asal_sekolah' => ['required', 'string', 'max:255'], 
             'members' => ['required', 'array', 'size:3'],
             'members.*.nama_lengkap' => ['required', 'string', 'max:255'],
             'members.*.email' => ['required', 'email', 'distinct', 'unique:members,email'],
             'members.*.kartu_pelajar' => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'foto_bukti_pembayaran' => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
+
         ]);
 
         if ($validator->fails()) {
-            return redirect('register')->withErrors($validator)->withInput();
+            return back()->withErrors($validator)->withInput();
         }
 
         DB::beginTransaction();
         try {
-            // 2. BUAT TEAM: TAMBAHKAN 'asal_sekolah'
-            $team = Team::create([
-                'nama_tim' => $request->nama_tim,
-                'password' => $request->password,
-                'asal_sekolah' => $request->asal_sekolah, 
-                'foto_bukti_pembayaran' => ""
-            ]);
+        $buktiPembayaranFile = $request->file('foto_bukti_pembayaran');
+        $namaTimSlug = Str::slug($request->nama_tim);
+          $pathBuktiPembayaran = $buktiPembayaranFile->storeAs(
+            'bukti_pembayaran', // Direktori di dalam storage/app/public
+            "{$namaTimSlug}_" . time() . ".{$buktiPembayaranFile->getClientOriginalExtension()}",
+            'public' 
+        );
+
+        $team = Team::create([
+            'nama_tim' => $request->nama_tim,
+            'password' => $request->password,
+            'asal_sekolah' => $request->asal_sekolah, 
+            'foto_bukti_pembayaran' => $pathBuktiPembayaran // <-- GUNAKAN PATH DI SINI
+        ]);
             User::create([
                 'name' => $request->nama_tim,
                 'role' => 'peserta',
