@@ -2,8 +2,7 @@
 <header class="bg-[#0D1B2E] fixed top-0 left-0 right-0 z-50 shadow-md text-white font-poppins font-semibold">
     <div class="container flex items-center justify-between py-3 px-6 max-w-screen-xl mx-auto font-poppins">
         <a href="{{ url('/') }}" class="flex">
-            <img src="{{ asset('images/Logo_Industrial_Games.png') }}" alt="Logo" class="h-12 w-auto">
-        </a>
+            <img src="{{ asset('images/Logo_Industrial_Games.png') }}" alt="Logo" class="h-10 lg:h-12 w-auto">        </a>
 
         <button id="navbar-toggle" class="lg:hidden text-white focus:outline-none font-poppins">
             <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2"

@@ -92,8 +92,10 @@
             <button class="carousel-button right" onclick="moveSlide(1)">&#10095;</button>
         </div>
 
-        <p class="text-base sm:text-lg md:text-xl font-semibold leading-relaxed border border-[#602C00] px-4 py-2 rounded-md bg-[#602C00] text-white mt-12">
-            IG (Industrial Games) adalah lomba bidang Teknik Industri yang berbentuk permainan/games untuk siswa-siswi SMA/SMK sederajat di seluruh Indonesia yang diselenggarakan oleh Teknik Industri Universitas Surabaya.
+        <p class="text-base sm:text-lg md:text-xl font-semibold leading-relaxed border border-[#602C00] px-4 py-2 rounded-md bg-[#602C00] text-white mt-12 text-justify">
+            IG (Industrial Games) adalah lomba bidang Teknik Industri yang berbentuk permainan/games 
+            untuk siswa-siswi SMA/SMK sederajat di seluruh Indonesia yang diselenggarakan oleh 
+            Teknik Industri Universitas Surabaya.        
         </p>
     </div>
 </section>
