@@ -18,7 +18,7 @@
             <a href="{{ url('/faq') }}" class="hover:text-gray-300">FAQ</a>
             
             {{-- INI YANG DIUBAH --}}
-            <a href="{{ asset('files/GuideBook.pdf') }}" target="_blank" class="hover:text-gray-300">GUIDEBOOK</a>
+            <a href="{{ asset('files/guidebook.pdf') }}" target="_blank" class="hover:text-gray-300">GUIDEBOOK</a>
             
             @auth
                 <a href="{{ route("peserta.rally") }}" class="hover:text-gray-300">RALLY</a>
