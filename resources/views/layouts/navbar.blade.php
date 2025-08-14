@@ -12,17 +12,15 @@
             </svg>
         </button>
 
+        {{-- MENU DESKTOP --}}
         <nav id="navbar-menu" class="hidden lg:flex lg:items-center lg:space-x-10 font-semibold font-poppins">
-            @auth
-                {{-- FIX #1: This now points to the correct homepage --}}
-                <a href="{{ url('/') }}" class="hover:text-gray-300">HOME</a>
-            @else
-                <a href="{{ url('/') }}" class="hover:text-gray-300">HOME</a>
-            @endauth
-
+            <a href="{{ url('/') }}" class="hover:text-gray-300">HOME</a>
             <a href="{{ url('/aboutus') }}" class="hover:text-gray-300">ABOUT US</a>
             <a href="{{ url('/faq') }}" class="hover:text-gray-300">FAQ</a>
-            <a href="{{ url('/guidebook') }}" class="hover:text-gray-300">GUIDEBOOK</a>
+            
+            {{-- INI YANG DIUBAH --}}
+            <a href="{{ asset('files/GuideBook.pdf') }}" target="_blank" class="hover:text-gray-300">GUIDEBOOK</a>
+            
             @auth
                 <a href="{{ route("peserta.rally") }}" class="hover:text-gray-300">RALLY</a>
                 <a href="{{ route('peserta.account-detail') }}" class="bg-gray-500 px-3 py-1 rounded-md hover:bg-gray-600 border border-gray-400 text-white">ACCOUNT</a>
@@ -33,18 +31,16 @@
         </nav>
     </div>
 
+    {{-- MENU MOBILE --}}
     <div id="mobile-menu" class="lg:hidden hidden px-4 pb-4 font-poppins">
         <div class="flex flex-col space-y-3 font-semibold">
-            @auth
-                {{-- FIX #2: This also points to the correct homepage --}}
-                <a href="{{ url('/') }}" class="hover:text-gray-300">HOME</a>
-            @else
-                <a href="{{ url('/') }}" class="hover:text-gray-300">HOME</a>
-            @endauth
-
+            <a href="{{ url('/') }}" class="hover:text-gray-300">HOME</a>
             <a href="{{ url('/aboutus') }}" class="hover:text-gray-300">ABOUT US</a>
             <a href="{{ url('/faq') }}" class="hover:text-gray-300">FAQ</a>
-            <a href="{{ url('/guidebook') }}" class="hover:text-gray-300">GUIDEBOOK</a>
+
+            {{-- INI JUGA DIUBAH AGAR KONSISTEN --}}
+            <a href="{{ asset('files/GuideBook.pdf') }}" target="_blank" class="hover:text-gray-300">GUIDEBOOK</a>
+
             @auth
                 <a href="{{ route("peserta.rally") }}" class="hover:text-gray-300">RALLY</a>
                 <a href="{{ route('peserta.account-detail') }}" class="bg-gray-500 px-3 py-1 rounded-md hover:bg-gray-600 border border-gray-400 text-white">ACCOUNT</a>
