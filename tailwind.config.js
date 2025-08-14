@@ -5,6 +5,9 @@ export default {
     "./resources/**/*.js",
     "./resources/**/*.vue",
   ],
+    safelist: [
+    "cursor-[url('/images/cursor.png'),_pointer]"
+  ],
   theme: {
     extend: {},
   },

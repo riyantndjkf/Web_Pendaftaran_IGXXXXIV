@@ -87,6 +87,11 @@
                 <div class="carousel-slide"><img src="images/DOKUM_1.jpg" alt="Carousel Image 1"></div>
                 <div class="carousel-slide"><img src="images/DOKUM_2.jpg" alt="Carousel Image 2"></div>
                 <div class="carousel-slide"><img src="images/DOKUM_3.jpg" alt="Carousel Image 3"></div>
+                <div class="carousel-slide"><img src="images/DOKUM_4.jpg" alt="Carousel Image 1"></div>
+                <div class="carousel-slide"><img src="images/DOKUM_5.jpg" alt="Carousel Image 2"></div>
+                <div class="carousel-slide"><img src="images/DOKUM_6.jpg" alt="Carousel Image 3"></div>
+                <div class="carousel-slide"><img src="images/DOKUM_7.jpg" alt="Carousel Image 1"></div>
+                <div class="carousel-slide"><img src="images/DOKUM_8.jpg" alt="Carousel Image 2"></div>
             </div>
             <button class="carousel-button left" onclick="moveSlide(-1)">&#10094;</button>
             <button class="carousel-button right" onclick="moveSlide(1)">&#10095;</button>
