@@ -58,6 +58,7 @@
                         <div>
                             <h3 class="text-xl font-semibold mb-2">Bukti Pembayaran</h3>
                             @if($team->foto_bukti_pembayaran)
+                                {{-- PERBAIKAN: Menambahkan str_replace untuk memperbaiki path --}}
                                 <a href="{{ asset('storage/' . str_replace('public/', '', $team->foto_bukti_pembayaran)) }}" target="_blank">
                                     <img src="{{ asset('storage/' . str_replace('public/', '', $team->foto_bukti_pembayaran)) }}" alt="Bukti Pembayaran" class="rounded-lg max-w-full h-auto max-h-96 object-contain">
                                 </a>
@@ -77,6 +78,7 @@
                                                 <p class="text-sm text-gray-400">{{ $member->email }}</p>
                                             </div>
                                             @if ($member->path_kartu_pelajar)
+                                                {{-- PERBAIKAN: Menambahkan str_replace untuk memperbaiki path --}}
                                                 <a href="{{ asset('storage/' . str_replace('public/', '', $member->path_kartu_pelajar)) }}" target="_blank" class="text-blue-400 hover:underline text-sm font-semibold ml-4 flex-shrink-0">
                                                     Lihat Kartu
                                                 </a>
@@ -85,7 +87,6 @@
                                         <div class="text-sm text-gray-300 space-y-1 mt-3 pt-3 border-t border-gray-700">
                                             <p><span class="font-semibold text-gray-400">Alamat:</span> {{ $member->alamat ?: '-' }}</p>
                                             <p><span class="font-semibold text-gray-400">Telepon:</span> {{ $member->nomor_telepon ?: '-' }}</p>
-                                            {{-- PENAMBAHAN DATA ALERGI DAN RIWAYAT PENYAKIT --}}
                                             <p><span class="font-semibold text-gray-400">Alergi:</span> {{ $member->alergi ?: 'Tidak ada' }}</p>
                                             <p><span class="font-semibold text-gray-400">Riwayat Penyakit:</span> {{ $member->riwayat_penyakit ?: 'Tidak ada' }}</p>
                                         </div>
