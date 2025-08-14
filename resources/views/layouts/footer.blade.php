@@ -10,7 +10,7 @@
                     <img src="{{ asset('icons/Instagram.png') }}" alt="Instagram" class="w-6 h-6"> @ig_ubaya
                 </li>
                 <li class="flex items-center gap-3">
-                    <img src="{{ asset('icons/Tiktok.png') }}" alt="Tiktok" class="w-6 h-6"> @ig_ubaya
+                    <img src="{{ asset('icons/Tiktok.png') }}" alt="Tiktok" class="w-6 h-6"> @ig_ubayaa
                 </li>
             </ul>
         </div>

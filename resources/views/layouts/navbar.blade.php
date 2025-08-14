@@ -22,7 +22,7 @@
 
             <a href="{{ url('/aboutus') }}" class="hover:text-gray-300">ABOUT US</a>
             <a href="{{ url('/faq') }}" class="hover:text-gray-300">FAQ</a>
-            <a href="{{ url('/guidebook') }}" class="hover:text-gray-300">GUIDELINE</a>
+            <a href="{{ url('/guidebook') }}" class="hover:text-gray-300">GUIDEBOOK</a>
             @auth
                 <a href="{{ route("peserta.rally") }}" class="hover:text-gray-300">RALLY</a>
                 <a href="{{ route('peserta.account-detail') }}" class="bg-gray-500 px-3 py-1 rounded-md hover:bg-gray-600 border border-gray-400 text-white">ACCOUNT</a>
@@ -44,7 +44,7 @@
 
             <a href="{{ url('/aboutus') }}" class="hover:text-gray-300">ABOUT US</a>
             <a href="{{ url('/faq') }}" class="hover:text-gray-300">FAQ</a>
-            <a href="{{ url('/guidebook') }}" class="hover:text-gray-300">GUIDELINE</a>
+            <a href="{{ url('/guidebook') }}" class="hover:text-gray-300">GUIDEBOOK</a>
             @auth
                 <a href="{{ route("peserta.rally") }}" class="hover:text-gray-300">RALLY</a>
                 <a href="{{ route('peserta.account-detail') }}" class="bg-gray-500 px-3 py-1 rounded-md hover:bg-gray-600 border border-gray-400 text-white">ACCOUNT</a>
